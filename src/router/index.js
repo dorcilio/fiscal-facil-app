@@ -3,7 +3,7 @@ import beforeEach from './beforeEach'
 // Components routes
 import Dashboard from '../views/dashboard'
 import Login from '../views/login'
-import Register from '../views/register'
+import Registration from '../views/registration'
 
 // Layouts
 const PLayout = () =>
@@ -18,7 +18,7 @@ const routes = [
     path: '/',
     redirect: '/dashboard',
     component: PLayout,
-    children: [Dashboard.route, Login.route, Register.route],
+    children: [Dashboard.route, Login.route, Registration.route],
   },
 
   // Always leave this as last one,

@@ -37,7 +37,7 @@ export default defineComponent({
   setup() {
     const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW()
 
-    const close = async () => {
+    const close = () => {
       offlineReady.value = false
       needRefresh.value = false
     }

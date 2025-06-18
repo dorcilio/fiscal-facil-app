@@ -154,7 +154,7 @@
             <div class="signup-section">
               <p class="signup-text">
                 Não é parceiro?
-                <custom-link to="/cadastro" color="green-7">
+                <custom-link to="/registration" color="green-7">
                   Faça seu cadastro
                 </custom-link>
               </p>

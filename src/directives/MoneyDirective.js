@@ -1,7 +1,7 @@
-import { format } from '../shared/money/util'
-import { setCursor, event } from '../shared/input'
-import assign from '../shared/money/assign'
-import defaults from '../shared/money/option'
+import { format } from '../utils/money/util'
+import { setCursor, event } from '../utils/input'
+import assign from '../utils/money/assign'
+import defaults from '../utils/money/option'
 
 const MoneyDirective = {
   mounted(el, binding) {

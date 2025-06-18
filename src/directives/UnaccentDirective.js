@@ -1,4 +1,4 @@
-import { unaccent } from '../shared/input'
+import { unaccent } from '../utils/input'
 
 const UnaccentDirective = {
   twoWay: true,

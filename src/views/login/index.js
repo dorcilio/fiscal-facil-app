@@ -1,11 +1,12 @@
 import MetaComponent from '../../models/meta-component'
 import MODULES from '../../models/modules'
-const Login = () => import(/* webpackChunkName: "login" */ './Index.vue')
+const LoginPage = () =>
+  import(/* webpackChunkName: "loginPage" */ './LoginPage.vue')
 
 const route = {
   path: 'login',
   name: 'login',
-  component: Login,
+  component: LoginPage,
   meta: new MetaComponent('Login', '', MODULES.DEFAULT, false, false, true),
 }
 

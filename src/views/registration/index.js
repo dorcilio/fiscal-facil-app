@@ -1,11 +1,12 @@
 import MetaComponent from '../../models/meta-component'
 import MODULES from '../../models/modules'
-const Register = () => import(/* webpackChunkName: "register" */ './Index.vue')
+const RegistrationPage = () =>
+  import(/* webpackChunkName: "registrationPage" */ './RegistrationPage.vue')
 
 const route = {
-  path: 'register',
-  name: 'register',
-  component: Register,
+  path: 'registration',
+  name: 'registration',
+  component: RegistrationPage,
   meta: new MetaComponent('Cadastro', '', MODULES.DEFAULT, false, false, true),
 }
 

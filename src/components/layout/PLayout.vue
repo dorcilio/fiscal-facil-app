@@ -32,7 +32,7 @@ import ReloadPrompt from './ReloadPrompt.vue'
 import CookiesBanner from '../CookiesBanner.vue'
 import PHeader from './PHeader.vue'
 import PDrawer from './PDrawer.vue'
-import { initializeCookieManagement } from '../../shared/cookies'
+import { initializeCookieManagement } from '../../utils/cookies'
 import { useUserStore } from '../../stores/user'
 // import DialogParceiroInfo from './parceiro/DialogParceiroInfo.vue'
 export default {

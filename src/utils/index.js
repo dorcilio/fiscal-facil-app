@@ -1,12 +1,3 @@
-const arrayEquals = (a, b) => {
-  return (
-    Array.isArray(a) &&
-    Array.isArray(b) &&
-    a.length === b.length &&
-    a.every((val, index) => val === b[index])
-  )
-}
-
 const toDateBR = (dateUS) => {
   return dateUS ? dateUS.split('-').reverse().join('/') : dateUS
 }
@@ -68,18 +59,7 @@ const wrapCsvValue = (val, formatFn, row) => {
   return `"${formatted}"`
 }
 
-export default {
-  arrayEquals,
-  toDateBR,
-  fixPhoneBR,
-  extractFileNameContentDisposition,
-  downloadFile,
-  formatBytes,
-  wrapCsvValue,
-}
-
 export {
-  arrayEquals,
   toDateBR,
   fixPhoneBR,
   extractFileNameContentDisposition,

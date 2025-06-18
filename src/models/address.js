@@ -4,9 +4,8 @@ import {
   minLength,
   numeric,
   required,
-  requiredIf,
 } from '@vuelidate/validators'
-import { capitalize } from '../shared/input'
+import { capitalize } from '../utils/input'
 
 class Address {
   /**
@@ -80,10 +79,13 @@ class Address {
     this.state = data.uf.toUpperCase()
     this.city = capitalize(data.municipio)
     this.neighborhood = capitalize(data.bairro)
-    this.ibge = data.ibge
-    this.address = capitalize(data.logradouro)
-    this.addressNumber = data.numero?.includes('SN') ? null : data.numero
-    this.complement = capitalize(data.complemento)
+    this.ibge = data.codigo_municipio_ibge
+    this.address = capitalize(
+      `${data?.descricao_tipo_de_logradouro ?? ''} ${data?.logradouro ?? ''}`
+    )
+    this.addressNumber =
+      !data.numero || data.numero.includes('SN') ? null : data.numero
+    this.complement = capitalize(data.complemento || '')
   }
 
   /**
@@ -163,16 +165,13 @@ const AddressValidation = {
     ),
   },
   neighborhood: {
-    required: helpers.withMessage(
-      'É necessário informar o Município',
-      required
-    ),
+    required: helpers.withMessage('É necessário informar o Bairro', required),
     minLength: helpers.withMessage(
-      'Município deve ser maior que 1 caracteres',
+      'Bairro deve ser maior que 1 caracteres',
       minLength(2)
     ),
     maxLength: helpers.withMessage(
-      'Município pode conter apenas 60 caracteres',
+      'Bairro pode conter apenas 60 caracteres',
       maxLength(60)
     ),
   },
@@ -212,12 +211,6 @@ const AddressValidation = {
     ),
   },
   complement: {
-    required: helpers.withMessage(
-      'Caso for informar o complemento, siga o padrão',
-      requiredIf((value) => {
-        return !!value
-      })
-    ),
     minLength: helpers.withMessage(
       'Complemento deve conter 2 caracteres',
       minLength(2)

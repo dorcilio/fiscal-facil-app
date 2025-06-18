@@ -58,7 +58,7 @@ import { computed, defineComponent, onMounted, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { sendMessage } from '../../../plugins'
 import { findParceirosContabilidade } from '../../../services/parceiro-service'
-import { unaccent } from '../../../shared/input'
+import { unaccent } from '../../../utils/input'
 
 export default defineComponent({
   name: 'PartnerFind',

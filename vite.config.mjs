@@ -6,7 +6,8 @@ import replace from '@rollup/plugin-replace'
 import eslintPlugin from 'vite-plugin-eslint'
 import svgLoader from 'vite-svg-loader'
 import dns from 'dns'
-import * as path from 'path'
+import * as path from 'path' // Você já tem 'path' importado, o que é ótimo!
+import { fileURLToPath, URL } from 'node:url' // Importe URL e fileURLToPath para aliases com Vite
 
 dns.setDefaultResultOrder('verbatim')
 
@@ -69,4 +70,10 @@ export default defineConfig({
       defaultImport: 'url', // or 'raw'
     }),
   ],
+  // ADICIONE ESTA SEÇÃO para configurar o alias '@'
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })

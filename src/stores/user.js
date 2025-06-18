@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import userService from '../services/user-service'
-import Cryptography from '../shared/cryptography'
+import Cryptography from '../utils/cryptography'
 import { UserProfile } from '../models/user'
 import { notifyError } from '../plugins/notify'
 import { useConnectionSocketStore } from './connection-socket'

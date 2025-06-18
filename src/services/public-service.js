@@ -1,4 +1,4 @@
-import { API_CEP, API_GEOIP, API_RECEITA } from '../config'
+import { API_CEP, API_GEO_IP, API_RECEITA } from '../config'
 import { axios } from '../plugins/http'
 
 /**
@@ -11,7 +11,7 @@ class PublicService {
    * @returns {Promise<Object>} Objeto contendo os dados do usuário
    */
   async findGeoInfo() {
-    const response = await axios.get(API_GEOIP, {
+    const response = await axios.get(API_GEO_IP, {
       withCredentials: false,
     })
     if (response.data.success === false) {

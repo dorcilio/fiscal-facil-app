@@ -1,4 +1,4 @@
-import { capitalize } from '../shared/input'
+import { capitalize } from '../utils/input'
 
 const CapitalizeDirective = {
   twoWay: true,
