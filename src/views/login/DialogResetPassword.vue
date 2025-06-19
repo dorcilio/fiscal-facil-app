@@ -88,7 +88,7 @@ export default defineComponent({
       type: String,
     },
   },
-  emits: ['update:dialog-visible', 'update:email', 'send:email', 'reset:email'],
+  emits: ['update:dialog-visible', 'update:email', 'send-email', 'reset-email'],
   setup(props, { emit }) {
     const rulesForgotPassword = computed(() => EmailValidation)
 
@@ -116,10 +116,10 @@ export default defineComponent({
     )
 
     const onReset = () => {
-      emit('reset:email')
+      emit('reset-email')
     }
     const onSend = () => {
-      if (!emailResetPassword$.value.$invalid) emit('send:email')
+      if (!emailResetPassword$.value.$invalid) emit('send-email')
     }
     return {
       dialogStatus,

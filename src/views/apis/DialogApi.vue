@@ -111,7 +111,7 @@ export default {
       type: Boolean,
     },
   },
-  emits: ['update:dialog-visible', 'update:api', 'reset:api'],
+  emits: ['update:dialog-visible', 'update:api', 'reset-api'],
   setup(props, { emit }) {
     const rules = computed(() => {
       return {
@@ -140,7 +140,7 @@ export default {
       emit('update:api', state.api)
     }
     const onReset = () => {
-      emit('reset:api')
+      emit('reset-api')
     }
 
     // const retrieveAllEnvironments = async () => {

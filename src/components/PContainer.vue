@@ -24,7 +24,6 @@ export default {
       default: 'fa-solid fa-pen-to-square',
     },
     title: {
-      required: true,
       type: String,
       default: '',
     },

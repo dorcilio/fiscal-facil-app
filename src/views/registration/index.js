@@ -1,7 +1,7 @@
 import MetaComponent from '../../models/meta-component'
 import MODULES from '../../models/modules'
 const RegistrationPage = () =>
-  import(/* webpackChunkName: "registrationPage" */ './RegistrationPage.vue')
+  import(/* webpackChunkName: "registrationPage" */ './PartnerRegistration.vue')
 
 const route = {
   path: 'registration',

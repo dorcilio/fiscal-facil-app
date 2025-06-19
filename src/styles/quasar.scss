@@ -1,16 +1,17 @@
-@import './quasar-variables.scss';
+@import './quasar-variables.scss'; // Certifique-se de que este caminho está correto
+
 // =============================================================================
-// SHARED AUTH PAGES STYLES (Login & Register)
+// GLOBAL UTILITIES & ANIMATIONS
 // =============================================================================
 
-// Common animations
+// Common animations (com a rotação já adicionada por você)
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-20px) rotate(180deg);
   }
 }
 
@@ -54,77 +55,245 @@
   }
 }
 
-// Base auth page layout
-.auth-page {
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes search-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes search-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+// =============================================================================
+// SHARED LAYOUT & PAGE BACKGROUNDS
+// =============================================================================
+
+// Base page layout for fullscreen content (e.g., auth, error pages)
+.full-page-layout {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding: 20px; // Adicionado padding padrão aqui, que era do .auth-page original no component
 }
 
-// Background styles
-.auth-background {
+// Generic background with gradient and animated blobs
+.bg-gradient-primary-green {
+  background: linear-gradient(
+    135deg,
+    #72c977 0%,
+    #1b5e20 100%
+  ); /* Primary green gradient */
+  .body--dark & {
+    background: linear-gradient(
+      135deg,
+      #2c3e50 0%,
+      #34495e 100%
+    ); /* Dark mode gradient */
+  }
+}
+
+// Generic background with light teal/cyan gradient (from RegistrationPage)
+.bg-gradient-teal-cyan {
+  background: linear-gradient(
+    135deg,
+    #e0f2f1 0%,
+    #a7ffeb 100%
+  ); /* Light teal/cyan gradient */
+  .body--dark & {
+    background: linear-gradient(
+      135deg,
+      #1a2a3a 0%,
+      #0a1e3a 100%
+    ); /* Darker blue gradient */
+  }
+}
+
+// Shared background decoration blobs (shapes)
+.layout-blob-decoration {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #72c977 0%, #1b5e20 100%);
+  border-radius: 50%;
+  opacity: 0.1; /* Padrão de opacidade mais baixo, como nos bg-decoration originais */
+
+  // Variações de cor para diferentes layouts (se precisar)
+  &--white {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  &--green {
+    background-color: #4caf50;
+  } // Green (do RegistrationPage)
+  &--blue {
+    background-color: #2196f3;
+  } // Blue (do RegistrationPage)
+  &--amber {
+    background-color: #ffc107;
+  } // Amber (do RegistrationPage)
+
+  // Ajustes para dark mode e blur do RegistrationPage (maior blur)
+  &--lg-blur {
+    filter: blur(80px);
+  }
+  .body--dark &--lg-blur {
+    opacity: 0.2;
+    filter: blur(60px);
+  }
+
+  // Ajustes de blur para as decorações menores (do auth-background original)
+  &--sm-blur {
+    filter: blur(0);
+  } // Não tinham blur explícito, mas o float já dá um efeito
+  &--sm-blur.layout-blob-decoration--white {
+    background: rgba(255, 255, 255, 0.1);
+    &.opacity-05 {
+      opacity: 0.05;
+    }
+    &.opacity-08 {
+      opacity: 0.08;
+    }
+  }
+}
+
+// Shared background particle animation (do error-page)
+.bg-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; // Garante que não interfira com interações
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: particle-float 15s linear infinite;
+  }
+}
+
+// =============================================================================
+// SHARED CONTAINER & CARD STYLES
+// =============================================================================
+
+// Common container for main content (max-width, padding, z-index)
+.content-container {
+  width: 100%;
+  padding: 20px;
+  z-index: 1; // Para estar acima do background
+
+  // Modificadores de largura
+  &--narrow {
+    max-width: 480px;
+  }
+  &--medium {
+    max-width: 520px;
+  } /* Usado para o registro, um pouco maior */
+  &--wide {
+    max-width: 800px;
+  } /* Usado para o stepper grande no registro ou páginas de erro */
+
+  @media (max-width: $breakpoint-xs-max) {
+    // Usando breakpoint do quasar-variables
+    padding: 16px; // Ajuste para mobile
+  }
+  @media (max-width: 400px) {
+    padding: 12px; // Ajuste para telas muito pequenas
+  }
+}
+
+// Generic frosted glass card style (formerly .auth-card)
+.app-card-frosted {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  overflow: hidden; // Para garantir que o blur não vaze para fora do card
+  animation: scale-in 0.5s ease; /* Adicionado aqui para ser o padrão de animação de entrada de cards */
+
+  &--loading {
+    opacity: 0.8;
+    pointer-events: none;
+  }
 
   .body--dark & {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: rgba(24, 35, 52, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
-  .bg-decoration {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.1;
+  @media (max-width: $breakpoint-xs-max) {
+    // Para mobile, você tinha border-radius total.
+    // Manter do component como padrão: 20px 20px 20px 20px.
+    // Se quiser menos arredondado em outras telas, pode sobreescrever.
+    border-radius: 20px; // Default já é 20px. O 20px 20px 20px 20px é redundante.
+    box-shadow: none; // No mobile, sem sombra extra.
+  }
+}
+
+// Default card padding (use as a utility class or mixin)
+.card-padding-lg {
+  padding: 32px;
+}
+.card-padding-md {
+  padding: 24px;
+} // From mobile adjustments
+
+// =============================================================================
+// AUTHENTICATION & ERROR PAGE SPECIFIC STYLES (mantidos, mas com classes globais aplicadas)
+// =============================================================================
+
+// Base page layout for authentication and general full-page forms/errors
+// Agora só aplica o background específico e a animação do blob/shapes
+.auth-page {
+  // Já pega .full-page-layout
+  @extend .bg-gradient-primary-green; // Usa o background específico de auth
+  // E aqui você pode adicionar os blobs específicos deste layout, usando a classe layout-blob-decoration e styles inline ou classes adicionais
+  .layout-blob-decoration {
     animation: float 6s ease-in-out infinite;
-
-    &--1 {
-      width: 200px;
-      height: 200px;
-      background: rgba(255, 255, 255, 0.1);
-      top: 10%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-
-    &--2 {
-      width: 150px;
-      height: 150px;
-      background: rgba(255, 255, 255, 0.05);
-      top: 60%;
-      right: 15%;
-      animation-delay: 2s;
-    }
-
-    &--3 {
-      width: 100px;
-      height: 100px;
-      background: rgba(255, 255, 255, 0.08);
-      bottom: 20%;
-      left: 20%;
-      animation-delay: 4s;
-    }
-  }
+  } // Animação de 6s específica
 }
 
-// Container styles
-.auth-container {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  z-index: 1;
-
-  &--register {
-    max-width: 520px;
-  }
+.error-page {
+  // Já pega .full-page-layout
+  @extend .bg-gradient-primary-green; // Error usa o mesmo gradiente que auth-page
+  // E aqui você pode adicionar os shapes e partículas do erro
+  .layout-blob-decoration {
+    animation: float 8s ease-in-out infinite;
+  } // Animação de 8s específica
 }
 
-// Header styles
+// Header styles for auth pages
 .auth-header {
   text-align: center;
   margin-bottom: 32px;
@@ -154,29 +323,102 @@
   }
 }
 
-// Form container styles
-.auth-form-container {
-  .auth-card {
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    animation: scale-in 0.5s ease;
+// Login-specific card header and actions (mantido, pois é bem específico do login)
+.login-header {
+  text-align: center;
+  padding: 32px 24px 24px;
 
-    &--loading {
-      opacity: 0.8;
+  .logo-container {
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+
+    &.animate-fade-in {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .body--dark & {
-      background: rgba(24, 35, 52, 0.95);
-      border-color: rgba(255, 255, 255, 0.1);
+    .logo {
+      max-width: 100%;
+      height: auto;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
     }
   }
 
+  .welcome-text {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease 0.2s;
+
+    &.animate-slide-up {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0 0 8px 0;
+      line-height: 1.3;
+
+      .body--dark & {
+        color: #ecf0f1;
+      }
+    }
+
+    .welcome-subtitle {
+      font-size: 15px;
+      color: #7f8c8d;
+      margin: 0;
+      line-height: 1.4;
+
+      .body--dark & {
+        color: #bdc3c7;
+      }
+    }
+  }
+}
+
+.login-actions {
+  padding: 0 24px 24px;
+  flex-direction: column;
+
+  .auth-btn.auth-btn--green {
+    box-shadow: 0 4px 12px rgba(33, 186, 69, 0.3);
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(33, 186, 69, 0.4);
+    }
+  }
+
+  .signup-section {
+    text-align: center;
+    width: 100%;
+
+    .signup-text {
+      margin: 0;
+      color: #7f8c8d;
+      font-size: 14px;
+
+      .body--dark & {
+        color: #bdc3c7;
+      }
+    }
+  }
+}
+
+// Form container styles (agora só usa o card genérico)
+.auth-form-container {
+  // Não precisa mais de .auth-card aqui, pois .app-card-frosted já faz o trabalho
   .card-padding {
     padding: 32px;
+    @media (max-width: 600px) {
+      padding: 24px;
+    }
+    @media (max-width: 400px) {
+      padding: 20px;
+    }
   }
 }
 
@@ -184,6 +426,9 @@
 .auth-form {
   .form-group {
     margin-bottom: 24px;
+    @media (max-width: 600px) {
+      margin-bottom: 20px;
+    }
 
     &:last-child {
       margin-bottom: 0;
@@ -215,6 +460,11 @@
     justify-content: space-between;
     align-items: center;
     margin: 20px 0;
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
 
     .remember-checkbox {
       .q-checkbox__label {
@@ -240,8 +490,8 @@
   }
 }
 
-// Button styles
-.auth-btn {
+// Button styles (gerais, podem ser usados em outros lugares)
+.app-btn {
   width: 100%;
   height: 48px;
   border-radius: 12px;
@@ -261,9 +511,9 @@
     transform: none;
   }
 
-  &--primary {
+  &--primary-green-shadow {
+    // Specific shadow for primary green buttons
     box-shadow: 0 4px 12px rgba(33, 186, 69, 0.3);
-
     &:hover:not(:disabled) {
       box-shadow: 0 6px 20px rgba(33, 186, 69, 0.4);
     }
@@ -287,12 +537,7 @@
   &.next-btn,
   &.submit-btn {
     flex: 1;
-    box-shadow: 0 4px 12px rgba(33, 186, 69, 0.3);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(33, 186, 69, 0.4);
-    }
+    @extend .app-btn--primary-green-shadow; // Reutiliza a sombra
   }
 
   &:disabled {
@@ -302,11 +547,12 @@
 }
 
 // Link styles
-.auth-link-container {
+.app-link-container {
+  // Generalizado de .auth-link-container
   text-align: center;
   margin-top: 24px;
 
-  .auth-link-text {
+  .app-link-text {
     color: #666;
     font-size: 14px;
     margin-right: 8px;
@@ -316,7 +562,7 @@
     }
   }
 
-  .auth-link {
+  .app-link {
     color: var(--q-primary);
     text-decoration: none;
     font-weight: 600;
@@ -329,7 +575,8 @@
 }
 
 // Separator styles
-.auth-separator {
+.app-separator {
+  // Generalizado de .auth-separator
   margin: 24px 0;
   position: relative;
   text-align: center;
@@ -363,7 +610,7 @@
 }
 
 // =============================================================================
-// REGISTER PAGE SPECIFIC STYLES
+// REGISTER PAGE SPECIFIC STYLES (mantidos como estavam, pois são bem específicos)
 // =============================================================================
 
 // Progress section
@@ -500,7 +747,7 @@
   }
 }
 
-// Data summary
+// Data summary (Registration and potentially other views)
 .data-summary {
   background: rgba(0, 0, 0, 0.02);
   border-radius: 12px;
@@ -595,64 +842,68 @@
 // RESPONSIVE DESIGN
 // =============================================================================
 
+@media (max-width: 768px) {
+  // General responsive adjustments (consider if these should be more granular or component-specific)
+  .profile-container {
+    padding: 8px;
+  }
+  .profile-header-content {
+    padding: 0 16px 16px !important;
+    .profile-info {
+      .profile-name {
+        font-size: 1.5rem !important;
+      }
+      .action-buttons {
+        .connect-btn,
+        .message-btn {
+          min-width: 100px;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+  .experience-item,
+  .education-item,
+  .certification-item {
+    flex-direction: column;
+    gap: 12px !important;
+    .edit-exp-btn,
+    .edit-edu-btn {
+      position: static !important;
+      align-self: flex-end;
+    }
+  }
+  .connections-info {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
 @media (max-width: 600px) {
-  .auth-page {
-    padding: 16px;
-  }
-
-  .auth-container {
-    padding: 16px;
-  }
-
-  .auth-header {
-    margin-bottom: 24px;
-
-    .logo-section {
-      padding: 20px;
-      margin-bottom: 20px;
+  .login-header {
+    padding: 24px 16px 20px;
+    .welcome-title {
+      font-size: 22px;
     }
-
-    .auth-title {
-      font-size: 1.75rem;
-    }
-
-    .auth-subtitle {
-      font-size: 0.9rem;
+    .welcome-subtitle {
+      font-size: 14px;
     }
   }
 
-  .auth-form-container {
-    .card-padding {
-      padding: 24px;
-    }
-  }
-
-  .auth-form {
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .remember-section {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
+  .login-actions {
+    padding: 0 16px 16px;
   }
 
   .form-actions {
     margin-top: 24px;
-
     .action-buttons {
       flex-direction: column;
-
       .nav-btn {
         width: 100%;
-
         &.prev-btn {
           order: 2;
           margin-top: 12px;
         }
-
         &.next-btn,
         &.submit-btn {
           order: 1;
@@ -661,23 +912,56 @@
     }
   }
 
-  .auth-separator {
+  .app-separator {
     margin: 20px 0;
+  } // Generalizado
+
+  .error-content {
+    padding: 40px 24px;
+    border-radius: 20px;
+  }
+  .error-number {
+    margin-bottom: 32px;
+  }
+  .error-message {
+    margin-bottom: 32px;
+  }
+  .error-suggestions {
+    margin-bottom: 32px;
+    .suggestion-item {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
+  }
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+    .action-btn {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cover-image-container {
+    height: 150px !important;
+  }
+  .profile-avatar {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  .avatar-section {
+    margin-top: -60px !important;
+  }
+  .action-buttons {
+    justify-content: center;
   }
 }
 
 @media (max-width: 400px) {
-  .auth-container {
-    padding: 12px;
-  }
-
-  .auth-form-container {
-    .card-padding {
-      padding: 20px;
-    }
-  }
-
-  .auth-title {
+  .auth-title,
+  .error-title {
     font-size: 1.5rem !important;
   }
 }
@@ -687,41 +971,65 @@
 // =============================================================================
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-background .bg-decoration,
+  .layout-blob-decoration, // Atualizado de .auth-background .bg-decoration, .error-background .bg-shape
+  .bg-particles .particle, // Atualizado de .error-background .bg-particles .particle
   .step-content,
-  .auth-card,
+  .app-card-frosted, // Atualizado de .auth-card
+  .error-content,
   .logo-section {
-    animation: none;
+    animation: none !important;
   }
 
-  .auth-btn,
+  .app-btn, // Atualizado de .auth-btn
   .nav-btn,
   .form-input {
-    transition: none;
+    transition: none !important;
   }
 }
 
 // Focus styles for accessibility
+.q-form {
+  // General form focus styles
+  :deep(.q-field--focused) {
+    .q-field__control {
+      box-shadow: 0 0 0 2px rgba(33, 186, 69, 0.2) !important;
+    }
+  }
+
+  :deep(.q-field--error) {
+    .q-field__control {
+      box-shadow: 0 0 0 2px rgba(193, 0, 21, 0.2) !important;
+    }
+  }
+}
+
 .auth-form {
+  // Auth specific form input focus
   .form-input:focus-within {
     outline: 2px solid var(--q-primary);
     outline-offset: 2px;
   }
 }
 
-.auth-btn:focus-visible,
-.nav-btn:focus-visible {
+.app-btn:focus-visible, // Atualizado de .auth-btn
+.nav-btn:focus-visible,
+.action-btn:focus-visible {
+  // Mantido, assumindo que .action-btn é uma classe para botões de ação genéricos
   outline: 2px solid var(--q-primary);
   outline-offset: 2px;
 }
 
 // High contrast mode support
 @media (prefers-contrast: high) {
-  .auth-background {
+  // .auth-background foi substituído por .bg-gradient-primary-green no componente, então ajustamos aqui
+  .bg-gradient-primary-green,
+  .bg-gradient-teal-cyan, // Adicionado para cobrir o do RegistrationPage
+  .error-page {
     background: #000 !important;
   }
 
-  .auth-card {
+  .app-card-frosted, // Atualizado de .auth-card
+  .error-content {
     background: #fff !important;
     border: 2px solid #000 !important;
 
@@ -732,124 +1040,13 @@
   }
 }
 
-.data-summary {
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-
-  .body--dark & {
-    background: rgba(255, 255, 255, 0.02);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .summary-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .q-icon {
-      margin-right: 12px;
-      font-size: 20px;
-    }
-
-    .summary-content {
-      .summary-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        .body--dark & {
-          color: #bdc3c7;
-        }
-      }
-
-      .summary-value {
-        font-size: 14px;
-        color: #2c3e50;
-        font-weight: 500;
-
-        .body--dark & {
-          color: #ecf0f1;
-        }
-      }
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .profile-container {
-    padding: 8px;
-  }
-
-  .profile-header-content {
-    padding: 0 16px 16px !important;
-
-    .profile-info {
-      .profile-name {
-        font-size: 1.5rem !important;
-      }
-
-      .action-buttons {
-        .connect-btn,
-        .message-btn {
-          min-width: 100px;
-          font-size: 0.9rem;
-        }
-      }
-    }
-  }
-
-  .experience-item,
-  .education-item,
-  .certification-item {
-    flex-direction: column;
-    gap: 12px !important;
-
-    .edit-exp-btn,
-    .edit-edu-btn {
-      position: static !important;
-      align-self: flex-end;
-    }
-  }
-
-  .connections-info {
-    flex-direction: column !important;
-    gap: 8px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .cover-image-container {
-    height: 150px !important;
-  }
-
-  .profile-avatar {
-    width: 120px !important;
-    height: 120px !important;
-  }
-
-  .avatar-section {
-    margin-top: -60px !important;
-  }
-
-  .action-buttons {
-    justify-content: center;
-  }
-}
-
-// Custom card dense
+// Other general styles from original quasar.scss
 .card-dense {
   padding: 6px 8px !important;
 }
 .q-router-link--active {
   color: var(--q-positive) !important;
+}
+.q-field__control {
+  color: #abddac;
 }

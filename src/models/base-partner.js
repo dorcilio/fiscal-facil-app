@@ -26,7 +26,7 @@ const isValidCnpj = (value) => {
   if (cleaned.length !== 14 || /^(.)\1{13}$/.test(cleaned)) return false
   let size = cleaned.length - 2
   let numbers = cleaned.substring(0, size)
-  let digits = cleaned.substring(size)
+  const digits = cleaned.substring(size)
   let sum = 0
   let pos = size - 7
   for (let i = size; i >= 1; i--) {

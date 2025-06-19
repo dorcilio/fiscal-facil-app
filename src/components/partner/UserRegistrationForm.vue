@@ -1,39 +1,3 @@
-<script>
-import { computed, defineComponent } from 'vue'
-import { UserRegistrationValidation } from '../../models/user' // Verifique o caminho
-import useVuelidate from '@vuelidate/core'
-
-export default defineComponent({
-  name: 'UserRegistrationForm',
-  props: {
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['update:modelValue'],
-
-  setup(props, { emit }) {
-    const internalUserForm = computed({
-      get: () => props.modelValue,
-      set: (value) => emit('update:modelValue', value),
-    })
-
-    const rules = computed(() => UserRegistrationValidation)
-    const v = useVuelidate(rules, internalUserForm, { $autoDirty: true })
-
-    return {
-      v,
-      internalUserForm,
-    }
-  },
-})
-</script>
-
 <template>
   <div class="user-registration-form q-pa-md">
     <h5 class="text-h6 q-mb-md">Dados do Responsável</h5>
@@ -143,3 +107,39 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
+<script>
+import { computed, defineComponent } from 'vue'
+import { UserRegistrationValidation } from '../../models/user' // Verifique o caminho
+import useVuelidate from '@vuelidate/core'
+
+export default defineComponent({
+  name: 'UserRegistrationForm',
+  props: {
+    modelValue: {
+      type: Object,
+      required: true,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['update:modelValue'],
+
+  setup(props, { emit }) {
+    const internalUserForm = computed({
+      get: () => props.modelValue,
+      set: (value) => emit('update:modelValue', value),
+    })
+
+    const rules = computed(() => UserRegistrationValidation)
+    const v = useVuelidate(rules, internalUserForm, { $autoDirty: true })
+
+    return {
+      v,
+      internalUserForm,
+    }
+  },
+})
+</script>

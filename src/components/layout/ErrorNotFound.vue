@@ -1,26 +1,40 @@
 <template>
   <q-layout view="lHh LpR lFr">
     <q-page-container>
-      <q-page class="error-page">
-        <!-- Background Elements -->
-        <div class="error-background">
-          <div class="bg-shape bg-shape--1" />
-          <div class="bg-shape bg-shape--2" />
-          <div class="bg-shape bg-shape--3" />
-          <div class="bg-particles">
-            <div
-              v-for="i in 20"
-              :key="i"
-              class="particle"
-              :style="{ animationDelay: `${i * 0.1}s` }"
-            />
-          </div>
-        </div>
-
-        <!-- Main Content -->
+      <q-page class="full-page-layout bg-gradient-teal-cyan">
+        <div
+          class="layout-blob-decoration layout-blob-decoration--green layout-blob-decoration--lg-blur"
+          style="
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            animation-delay: 0s;
+          "
+        />
+        <div
+          class="layout-blob-decoration layout-blob-decoration--blue layout-blob-decoration--lg-blur"
+          style="
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 2s;
+          "
+        />
+        <div
+          class="layout-blob-decoration layout-blob-decoration--amber layout-blob-decoration--lg-blur"
+          style="
+            width: 250px;
+            height: 250px;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+            animation-delay: 4s;
+          "
+        />
         <div :class="containerClasses">
           <div class="error-content" :class="{ 'animate-in': showAnimation }">
-            <!-- 404 Number -->
             <div class="error-number">
               <span class="number-4 number-4--first">4</span>
               <div class="number-0">
@@ -33,7 +47,6 @@
               <span class="number-4 number-4--last">4</span>
             </div>
 
-            <!-- Error Message -->
             <div class="error-message">
               <h1 class="error-title">Oops! Página não encontrada</h1>
               <p class="error-subtitle">
@@ -42,7 +55,6 @@
               </p>
             </div>
 
-            <!-- Suggestions -->
             <div class="error-suggestions">
               <div class="suggestion-item">
                 <q-icon name="fas fa-lightbulb" class="suggestion-icon" />
@@ -58,7 +70,6 @@
               </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="error-actions">
               <q-btn
                 color="green-7"
@@ -84,7 +95,6 @@
               />
             </div>
 
-            <!-- Auto Redirect Info -->
             <div v-if="countdown > 0 && !isRedirecting" class="auto-redirect">
               <q-linear-progress
                 :value="(10 - countdown) / 10"
@@ -107,7 +117,6 @@
               </p>
             </div>
 
-            <!-- Help Links -->
             <div class="help-links">
               <custom-link to="/contato" icon="fas fa-envelope" color="info">
                 Entre em contato
@@ -124,7 +133,6 @@
           </div>
         </div>
 
-        <!-- Floating Action Button for Mobile -->
         <q-page-sticky
           v-if="isMobile"
           position="bottom-right"
@@ -172,7 +180,7 @@ export default defineComponent({
     const isMobile = computed(() => $q.platform.is.mobile)
 
     const containerClasses = computed(() => ({
-      'error-container': true,
+      'error-container': true, // This class is custom to ErrorNotFound's wrapper form.
       'error-container--mobile': isMobile.value,
       'error-container--desktop': !isMobile.value,
     }))
@@ -262,105 +270,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/quasar-variables.scss';
+@import '../../styles/quasar-variables.scss'; // Ensure variables are imported
 
-.error-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #72c977 0%, #1b5e20 100%);
+// The core background is now defined in quasar.scss under .error-page
+// The decorative elements (bg-shape, bg-particles) are also in quasar.scss
+// Therefore, this component's scoped styles focus only on its unique content layout and animations.
 
-  .body--dark & {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  }
-}
-
-.error-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-
-  .bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.1;
-    animation: float 8s ease-in-out infinite;
-
-    &--1 {
-      width: 300px;
-      height: 300px;
-      background: rgba(255, 255, 255, 0.1);
-      top: -150px;
-      left: -150px;
-      animation-delay: 0s;
-    }
-
-    &--2 {
-      width: 200px;
-      height: 200px;
-      background: rgba(255, 255, 255, 0.05);
-      top: 20%;
-      right: -100px;
-      animation-delay: 3s;
-    }
-
-    &--3 {
-      width: 150px;
-      height: 150px;
-      background: rgba(255, 255, 255, 0.08);
-      bottom: -75px;
-      left: 30%;
-      animation-delay: 6s;
-    }
-  }
-
-  .bg-particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      animation: particle-float 15s linear infinite;
-
-      &:nth-child(odd) {
-        left: 10%;
-        animation-duration: 12s;
-      }
-
-      &:nth-child(even) {
-        right: 10%;
-        animation-duration: 18s;
-      }
-
-      &:nth-child(3n) {
-        left: 50%;
-        animation-duration: 20s;
-      }
-    }
-  }
-}
-
-.error-container {
-  width: 100%;
-  max-width: 800px;
-  padding: 40px 20px;
-  z-index: 1;
-
-  &--mobile {
-    padding: 20px 16px;
-  }
-}
+// Removed the entire .error-page, .error-background, .bg-shape, .bg-particles
+// blocks as they are now global in quasar.scss.
 
 .error-content {
   text-align: center;
@@ -402,7 +319,7 @@ export default defineComponent({
 
   .number-4 {
     display: inline-block;
-    animation: bounce-in 1s ease-out;
+    animation: bounce-in 1s ease-out; // Animation specific to this component
 
     &--first {
       animation-delay: 0.2s;
@@ -423,17 +340,17 @@ export default defineComponent({
     justify-content: center;
     border: 8px solid $green-7;
     border-radius: 50%;
-    animation: scale-in 1s ease-out 0.4s both;
+    animation: scale-in 1s ease-out 0.4s both; // Animation specific to this component
 
     .search-icon {
       font-size: 0.4em;
       color: $green-7;
-      animation: search-pulse 2s ease-in-out infinite;
+      animation: search-pulse 2s ease-in-out infinite; // Animation specific to this component
 
       &.animate-spin {
         animation:
           search-spin 1s ease-in-out,
-          search-pulse 2s ease-in-out infinite 1s;
+          search-pulse 2s ease-in-out infinite 1s; // Animation specific to this component
       }
     }
   }
@@ -528,6 +445,7 @@ export default defineComponent({
     transition: all 0.3s ease;
 
     &--primary {
+      // This class is not directly used in the template, but kept from original CSS
       box-shadow: 0 4px 12px rgba(33, 186, 69, 0.3);
 
       &:hover:not(:disabled) {
@@ -537,6 +455,7 @@ export default defineComponent({
     }
 
     &--secondary {
+      // This class is not directly used in the template, but kept from original CSS
       &:hover:not(:disabled) {
         transform: translateY(-2px);
       }
@@ -612,34 +531,7 @@ export default defineComponent({
   }
 }
 
-// Animations
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-  }
-}
-
-@keyframes particle-float {
-  0% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
+// Animations specific to ErrorNotFound content, moved here from original stylesheet
 @keyframes bounce-in {
   0% {
     transform: scale(0) rotate(-180deg);
@@ -689,7 +581,7 @@ export default defineComponent({
   }
 }
 
-// Responsive improvements
+// Responsive improvements for ErrorNotFound (remaining local adjustments)
 @media (max-width: 768px) {
   .error-suggestions {
     .suggestion-item {
@@ -713,7 +605,7 @@ export default defineComponent({
   }
 }
 
-// Accessibility improvements
+// Accessibility improvements specific to ErrorNotFound
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -722,7 +614,7 @@ export default defineComponent({
   }
 }
 
-// Focus improvements
+// Focus improvements for ErrorNotFound buttons
 .action-btn:focus-visible {
   outline: 2px solid $primary;
   outline-offset: 2px;

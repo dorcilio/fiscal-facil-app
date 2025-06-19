@@ -6,8 +6,8 @@ import replace from '@rollup/plugin-replace'
 import eslintPlugin from 'vite-plugin-eslint'
 import svgLoader from 'vite-svg-loader'
 import dns from 'dns'
-import * as path from 'path' // Você já tem 'path' importado, o que é ótimo!
-import { fileURLToPath, URL } from 'node:url' // Importe URL e fileURLToPath para aliases com Vite
+import * as path from 'path'
+import { fileURLToPath, URL } from 'node:url'
 
 dns.setDefaultResultOrder('verbatim')
 
@@ -17,7 +17,6 @@ const pwaOptions = {
   includeAssets: ['favicon.ico'],
   devOptions: {
     enabled: process.env.SW_DEV === 'false',
-    /* when using generateSW the PWA plugin will switch to classic */
     type: 'module',
     navigateFallback: 'index.html',
   },
@@ -28,7 +27,9 @@ const replaceOptions = {
   preventAssignment: true,
 }
 
-// https://vitejs.dev/config/
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 export default defineConfig({
   server: {
     host: true,
@@ -36,14 +37,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    // proxy: {
-    //   '/development': {
-    //     target: 'https://api.ncmhelper.com.br',
-    //     changeOrigin: true,
-    //     secure: false,
-    //     rewrite: (path) => path.replace(/^\/development/, ''),
-    //   },
-    // },
   },
   preview: {
     port: 8080,
@@ -67,10 +60,17 @@ export default defineConfig({
       exclude: [/virtual:/, /node_modules/],
     }),
     svgLoader({
-      defaultImport: 'url', // or 'raw'
+      defaultImport: 'url',
     }),
   ],
-  // ADICIONE ESTA SEÇÃO para configurar o alias '@'
+  // css: {
+  //   preprocessorOptions: {
+  //     scss: {
+  //       additionalData: `@import "${path.resolve(__dirname, 'node_modules/quasar/src/css/variables.sass')}";`,
+  //       // additionalData: `@import "${path.resolve(__dirname, 'src/styles/quasar-variables.scss')}"`,
+  //     },
+  //   }
+  // },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

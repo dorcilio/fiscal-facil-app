@@ -23,7 +23,6 @@ class ContabilidadeRegistration {
     this.cnaes = []
 
     this.address = new Address()
-
     this.user = new UserRegistration()
   }
 
@@ -46,6 +45,45 @@ class ContabilidadeRegistration {
 
     this.address.parseFromReceitaWS(data)
   }
+
+  /**
+   * MELHORIA: Método toRequest para formatar o payload final para a API.
+   * Garante que os sub-objetos também sejam formatados corretamente.
+   */
+  toRequest() {
+    return {
+      cpfCnpj: this.cpfCnpj,
+      razaoSocial: this.razaoSocial,
+      fantasia: this.fantasia,
+      telefone: this.telefone,
+      telefoneSecundario: this.telefoneSecundario,
+      cnaeId: this.cnaeId,
+      cnaeDescricao: this.cnaeDescricao,
+      cnaes: this.cnaes,
+      address: this.address.toRequest(), // Chama o toRequest do endereço
+      user: this.user.toRequest(), // Chama o toRequest do usuário
+      // Adicione outros campos específicos se necessário (ex: ie)
+    }
+  }
+
+  /**
+   * MELHORIA: Método reset para limpar todos os dados do formulário,
+   * incluindo os objetos aninhados.
+   */
+  reset() {
+    this.cpfCnpj = ''
+    this.razaoSocial = ''
+    this.fantasia = ''
+    this.telefone = ''
+    this.telefoneSecundario = ''
+    this.situacaoReceita = ''
+    this.cnaeId = ''
+    this.cnaeDescricao = ''
+    this.cnaes = []
+
+    this.address.reset() // Chama o reset do endereço
+    this.user.reset() // Chama o reset do usuário
+  }
 }
 
 class PessoaFisicaRegistration extends ContabilidadeRegistration {
@@ -53,11 +91,35 @@ class PessoaFisicaRegistration extends ContabilidadeRegistration {
     super()
     this.ie = ''
   }
+
+  toRequest() {
+    return {
+      ...super.toRequest(),
+      ie: this.ie,
+    }
+  }
+
+  reset() {
+    super.reset()
+    this.ie = ''
+  }
 }
 
 class PessoaJuridicaRegistration extends ContabilidadeRegistration {
   constructor() {
     super()
+    this.ie = ''
+  }
+
+  toRequest() {
+    return {
+      ...super.toRequest(),
+      ie: this.ie,
+    }
+  }
+
+  reset() {
+    super.reset()
     this.ie = ''
   }
 }

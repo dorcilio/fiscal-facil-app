@@ -7,33 +7,34 @@ import { useConnectionSocketStore } from './connection-socket'
 
 const ACCESS_TOKEN_KEY = 'ff-access-token'
 const USER_TOKEN_KEY = 'ff-user-token'
-const REMEMBER_KEY = 'ff-remember'
+const REMEMBER_ME_KEY = 'ff-remember-me' // Renomeado para maior clareza
 const REMEMBER_EMAIL_KEY = 'ff-remember-email'
 
+// Carrega os estados iniciais do localStorage
 const localAccessToken = JSON.parse(
   window.localStorage.getItem(ACCESS_TOKEN_KEY)
 )
 const localTempUser = window.localStorage.getItem(USER_TOKEN_KEY)
 const user = localTempUser ? Cryptography.decrypt(localTempUser) : null
-const localRememberMe = window.localStorage.getItem(REMEMBER_KEY)
+const localRememberMe = window.localStorage.getItem(REMEMBER_ME_KEY) // Usando a nova chave
 const localRememberEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
 
-// This store manages the dark mode theme setting for the application
-// It allows toggling between dark and light modes and persists the setting in localStorage
+// This store manages user authentication state, profile, and session tokens.
+// It allows for login, logout, token refresh, and remembering user email.
 export const useUserStore = defineStore('user', {
   state: () => ({
-    accessToken: localAccessToken ? localAccessToken : null,
-    user: user ? user : new UserProfile(),
+    accessToken: localAccessToken,
+    user: user || new UserProfile(), // Garante que user seja sempre uma instância de UserProfile
     isLoading: false,
     errorMessage: '',
     errorCode: '',
-    isAuthenticated: user && localAccessToken ? true : false,
+    isAuthenticated: !!(user && localAccessToken), // Simplificado para boolean
     rememberMe: localRememberMe ? JSON.parse(localRememberMe) : false,
-    rememberEmail: localRememberEmail ? localRememberEmail : '',
+    rememberEmail: localRememberEmail || '',
   }),
   getters: {
     getRememberEmail: (state) => state.rememberEmail,
-    getRemember: (state) => state.remember,
+    // getRemember foi removido, pois rememberMe já é direto
     getEmailByUser: (state) => state.user?.email ?? '',
     getModulesByUser: (state) => state.user?.modules ?? ['default'],
     getRazaoSocialByUser: (state) => state.user?.razaoSocial ?? '',
@@ -42,8 +43,9 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     /**
-     * Busca dados do usuário para perfil
-     * @returns {Promise<Object>} Objeto contendo os dados do usuário
+     * Busca dados do usuário para perfil.
+     * Gerencia o estado de loading e exibe notificações de erro.
+     * @returns {Promise<Object|null>} Objeto contendo os dados do usuário, ou null em caso de erro.
      */
     async findForProfile() {
       this.isLoading = true
@@ -51,29 +53,30 @@ export const useUserStore = defineStore('user', {
       this.errorCode = ''
       try {
         const { data } = await userService.findUserForProfile()
-        return Promise.resolve(data)
+        return data
       } catch (error) {
-        this.errorMessage = error?.data?.message ?? 'Erro desconhecido'
-        this.errorCode = error?.data?.code ?? 'UNKNOWN_ERROR'
+        this.errorMessage =
+          error?.data?.message ?? 'Erro ao buscar perfil do usuário'
+        this.errorCode = error?.data?.code ?? 'PROFILE_FETCH_ERROR'
         notifyError(this.errorMessage, error)
+        return null // Retorna null em caso de erro
       } finally {
         this.isLoading = false
       }
     },
 
     /**
-     * Handles user login process by performing the following steps:
-     * 1. Sets the loading state to true.
-     * 2. Calls the login function from the user service with provided credentials.
-     * 3. Sets the access token in the store.
-     * 4. Fetches user profile data and updates the user state.
-     * 5. Saves the user's email for "Remember Me" functionality.
-     * 6. Handles errors by displaying an error notification if any occur.
-     * 7. Resets the loading state to false regardless of success or failure.
-     * @param {Object} credentials - User credentials for login.
-     * @param {string} credentials.email - User's email address.
-     * @param {string} credentials.senha - User's password.
-     * @returns {Promise<Object>} - Promise resolving to user profile data.
+     * Lida com o processo de login do usuário.
+     * 1. Define o estado de carregamento.
+     * 2. Chama o serviço de login.
+     * 3. Define o token de acesso e busca o perfil do usuário.
+     * 4. Salva o e-mail se a opção "Lembrar-me" estiver ativada.
+     * 5. Conecta o socket se o login for bem-sucedido.
+     * 6. Lida com erros e reinicia o estado de carregamento.
+     * @param {Object} credentials - Credenciais do usuário (email e senha).
+     * @param {string} credentials.email - Endereço de e-mail do usuário.
+     * @param {string} credentials.senha - Senha do usuário.
+     * @returns {Promise<Object|null>} Retorna os dados do perfil do usuário em caso de sucesso, ou null em caso de falha.
      */
     async login(credentials) {
       this.isLoading = true
@@ -82,31 +85,47 @@ export const useUserStore = defineStore('user', {
       try {
         const { accessToken } = await userService.login(credentials)
         this.setAccessToken(accessToken)
-        const data = await this.findForProfile()
-        this.setUser(data)
-        this.setRememberEmail(credentials.email)
-        // Conectar socket após login
-        // const socketStore = duseConnectionSocketStore()
-        // socketStore.connect()
 
-        return Promise.resolve(data)
+        const userData = await this.findForProfile() // Chamada que já trata erros e loading
+        if (!userData) {
+          throw new Error('Falha ao obter dados do perfil após o login.')
+        }
+        this.setUser(userData)
+
+        // Lógica para "Lembrar-me" agora baseada no estado do checkbox do componente
+        if (this.rememberMe) {
+          window.localStorage.setItem(REMEMBER_EMAIL_KEY, credentials.email)
+        } else {
+          window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
+        }
+        window.localStorage.setItem(
+          REMEMBER_ME_KEY,
+          JSON.stringify(this.rememberMe)
+        )
+
+        // Conectar socket após login (removido comentário desnecessário)
+        const socketStore = useConnectionSocketStore()
+        socketStore.connect()
+
+        return userData // Retorna os dados do usuário em caso de sucesso
       } catch (error) {
-        this.errorMessage = error?.data?.message ?? 'Erro desconhecido'
-        this.errorCode = error?.data?.code ?? 'UNKNOWN_ERROR'
+        this.errorMessage = error?.data?.message ?? 'Erro ao realizar login'
+        this.errorCode = error?.data?.code ?? 'LOGIN_ERROR'
         notifyError(this.errorMessage, error)
+        this.clearSession() // Limpa a sessão em caso de erro de login
+        return null
       } finally {
         this.isLoading = false
       }
     },
 
     /**
-     * Handles the refresh token process by performing the following steps:
-     * 1. Sets the loading state to true.
-     * 2. Calls the refresh function from the user service.
-     * 3. Sets the access token in the store.
-     * 4. Handles errors by displaying an error notification if any occur.
-     * 5. Resets the loading state to false regardless of success or failure.
-     * @returns {Promise<string>} - Promise resolving to the new access token.
+     * Lida com o processo de atualização do token de acesso.
+     * 1. Define o estado de carregamento.
+     * 2. Chama o serviço de atualização de token.
+     * 3. Define o novo token de acesso na store.
+     * 4. Lida com erros e reinicia o estado de carregamento.
+     * @returns {Promise<string>} Promessa que resolve para o novo token de acesso.
      */
     async refreshToken() {
       this.isLoading = true
@@ -115,35 +134,43 @@ export const useUserStore = defineStore('user', {
       try {
         const { accessToken } = await userService.refresh()
         this.setAccessToken(accessToken)
-        useConnectionSocketStore().updateAuthToken()
-        return Promise.resolve(accessToken)
+        useConnectionSocketStore().updateAuthToken() // Atualiza o token no socket
+        return accessToken
       } catch (error) {
-        this.errorMessage = error?.data?.message ?? 'Erro desconhecido'
-        this.errorCode = error?.data?.code ?? 'UNKNOWN_ERROR'
-        throw error
+        this.errorMessage =
+          error?.data?.message ?? 'Erro ao renovar token de acesso'
+        this.errorCode = error?.data?.code ?? 'TOKEN_REFRESH_ERROR'
+        notifyError(this.errorMessage, error)
+        this.clearSession() // Limpa a sessão se o refresh falhar
+        throw error // Re-lança o erro para que chamadas externas possam tratá-lo
       } finally {
         this.isLoading = false
       }
     },
+
     /**
-     * Salva o e-mail do usuário no local storage e atualiza o estado para lembrar ou não
-     * @param {string} email - E-mail do usuário
+     * Define o e-mail para a funcionalidade "Lembrar-me".
+     * Esta função é chamada pelo v-model do checkbox no componente.
+     * A persistência no localStorage ocorre no 'login' e no próprio v-model do checkbox se for implementado um watcher.
+     * @param {string} email - E-mail do usuário a ser lembrado.
      */
     setRememberEmail(email) {
       this.rememberEmail = email
-      this.rememberMe = !!email
-      if (!email) {
-        window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
-        window.localStorage.setItem(REMEMBER_KEY, false)
-      } else {
-        window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
-        window.localStorage.setItem(REMEMBER_KEY, true)
-      }
+      // A persistência no localStorage para REMEMBER_EMAIL_KEY e REMEMBER_ME_KEY
+      // é agora tratada na ação `login` com base no estado `this.rememberMe` do checkbox,
+      // e no watcher da `rememberMe` no componente.
+      // Ou, se você quiser que este método seja o único a tocar no localStorage para rememberEmail:
+      // if (!email) {
+      //   window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
+      // } else {
+      //   window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+      // }
+      // NÃO SETAR rememberMe aqui diretamente, pois ele é controlado pelo checkbox via v-model.
     },
 
     /**
-     * Salva o access token no local storage e atualiza o estado de autenticação do usuário
-     * @param {string} accessToken - Token de acesso do usu rio
+     * Salva o access token no local storage e atualiza o estado de autenticação do usuário.
+     * @param {string} accessToken - Token de acesso do usuário.
      */
     setAccessToken(accessToken) {
       if (accessToken) {
@@ -161,14 +188,10 @@ export const useUserStore = defineStore('user', {
     },
 
     /**
-     * Sets the user information in the store and localStorage.
-     * If a user object is provided, it encrypts and stores it in localStorage,
-     * updates the store with the user data, and sets the authenticated state to true.
-     * If no user object is provided, it removes the user data from localStorage,
-     * resets the store's user data to a new UserProfile instance, and sets the
-     * authenticated state to false.
-     *
-     * @param {Object|null} user - The user object to be set, or null to reset the user.
+     * Define as informações do usuário na store e no localStorage.
+     * Se um objeto de usuário for fornecido, ele é criptografado e armazenado.
+     * Se for null, os dados do usuário são removidos.
+     * @param {Object|null} user - O objeto do usuário a ser definido, ou null para resetar.
      */
     setUser(user) {
       if (user) {
@@ -177,45 +200,57 @@ export const useUserStore = defineStore('user', {
         this.isAuthenticated = true
       } else {
         window.localStorage.removeItem(USER_TOKEN_KEY)
-        this.user = new UserProfile()
+        this.user = new UserProfile() // Reseta para uma nova instância
         this.isAuthenticated = false
       }
     },
 
     /**
-     * Logs out the user by performing the following steps:
-     * 1. Sets the loading state to true.
-     * 2. Calls the logout function from the user service.
-     * 3. Removes access token and user token from localStorage.
-     * 4. Updates the authentication state and resets user data in the store.
-     * 5. Disconnects any active socket connections.
-     * 6. Handles errors by displaying an error notification if any occur.
-     * 7. Resets the loading state to false regardless of success or failure.
+     * Limpa todos os dados da sessão do usuário no localStorage e na store.
+     * Usado internamente em caso de logout ou falha crítica de autenticação.
+     */
+    clearSession() {
+      window.localStorage.removeItem(ACCESS_TOKEN_KEY)
+      window.localStorage.removeItem(USER_TOKEN_KEY)
+      // Mantém REMEMBER_ME_KEY e REMEMBER_EMAIL_KEY intactos para a funcionalidade "Lembrar-me"
+      // Se rememberMe estiver desativado no login, eles serão limpos lá.
+      this.isAuthenticated = false
+      this.accessToken = null
+      this.user = new UserProfile()
+      // O rememberMe e rememberEmail não são alterados aqui,
+      // pois são persistidos separadamente e dependem da escolha do usuário.
+    },
+
+    /**
+     * Realiza o logout do usuário.
+     * 1. Define o estado de carregamento.
+     * 2. Chama o serviço de logout.
+     * 3. Limpa a sessão.
+     * 4. Desconecta o socket.
+     * 5. Lida com erros e reinicia o estado de carregamento.
+     * @returns {Promise<void>}
      */
     async logout() {
       this.isLoading = true
       this.errorMessage = ''
       this.errorCode = ''
       try {
-        await userService.logout()
-        window.localStorage.removeItem(ACCESS_TOKEN_KEY)
-        window.localStorage.removeItem(USER_TOKEN_KEY)
-        this.isAuthenticated = false
-        this.accessToken = null
-        this.user = null
-        const socketStore = useConnectionSocketStore()
-        socketStore.disconnect()
+        await userService.logout() // Chama o serviço de logout no backend
       } catch (error) {
-        this.errorMessage = error?.data?.message ?? 'Erro desconhecido'
-        this.errorCode = error?.data?.code ?? 'UNKNOWN_ERROR'
+        this.errorMessage = error?.data?.message ?? 'Erro ao realizar logout'
+        this.errorCode = error?.data?.code ?? 'LOGOUT_ERROR'
         notifyError(this.errorMessage, error)
       } finally {
+        this.clearSession() // Sempre limpa a sessão, mesmo se o logout no backend falhar
+        const socketStore = useConnectionSocketStore()
+        socketStore.disconnect() // Garante que o socket seja desconectado
         this.isLoading = false
       }
     },
   },
 })
 
+// HMR para desenvolvimento
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot))
 }

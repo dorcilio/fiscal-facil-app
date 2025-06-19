@@ -48,8 +48,8 @@
               @update:rows="state.apis = $event"
               @update:filter="state.filter = $event"
               @update:pagination="state.pagination = $event"
-              @request:rows="onRequest"
-              @sync:rows="onSync"
+              @request="onRequest"
+              @syncronize="onSync"
               @on-remove="onRemoveApi"
               @on-change-key="onChangeApiKey"
             />
@@ -62,7 +62,7 @@
       :api="state.api"
       @update:dialog-visible="state.dialogVisible = $event"
       @update:api="onUpdateApi"
-      @reset:api="onResetApi"
+      @reset-api="onResetApi"
     >
     </dialog-api>
     <dialog-api-key

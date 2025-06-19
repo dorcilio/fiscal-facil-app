@@ -129,8 +129,8 @@ export default {
     },
   },
   emits: [
-    'request:rows',
-    'sync:rows',
+    'request',
+    'syncronize',
     'update:filter',
     'update:pagination',
     'on-change-key',
@@ -179,10 +179,10 @@ export default {
     })
 
     const onRequest = (payload) => {
-      emit('request:rows', payload)
+      emit('request', payload)
     }
     const onSync = () => {
-      emit('sync:rows')
+      emit('syncronize')
     }
 
     const $q = useQuasar()

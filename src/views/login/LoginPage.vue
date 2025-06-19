@@ -1,20 +1,42 @@
 <template>
-  <q-page class="auth-page">
-    <div class="auth-background">
-      <!-- Background decorative elements -->
-      <div class="bg-decoration bg-decoration--1" />
-      <div class="bg-decoration bg-decoration--2" />
-      <div class="bg-decoration bg-decoration--3" />
-    </div>
-
-    <div class="auth-container">
-      <q-form
-        :class="formClasses"
-        novalidate
-        @submit.prevent="handleFormSubmit"
-      >
-        <q-card class="auth-card" :class="{ 'auth-card--loading': isLoading }">
-          <!-- Header Section -->
+  <q-page class="full-page-layout bg-gradient-teal-cyan">
+    <div
+      class="layout-blob-decoration layout-blob-decoration--green layout-blob-decoration--lg-blur"
+      style="
+        width: 300px;
+        height: 300px;
+        top: -50px;
+        left: -50px;
+        animation-delay: 0s;
+      "
+    />
+    <div
+      class="layout-blob-decoration layout-blob-decoration--blue layout-blob-decoration--lg-blur"
+      style="
+        width: 400px;
+        height: 400px;
+        bottom: -100px;
+        right: -100px;
+        animation-delay: 2s;
+      "
+    />
+    <div
+      class="layout-blob-decoration layout-blob-decoration--amber layout-blob-decoration--lg-blur"
+      style="
+        width: 250px;
+        height: 250px;
+        top: 50%;
+        left: 20%;
+        transform: translateY(-50%);
+        animation-delay: 4s;
+      "
+    />
+    <div class="content-container content-container--wide">
+      <q-form novalidate @submit.prevent="handleFormSubmit">
+        <q-card
+          class="app-card-frosted"
+          :class="{ 'app-card-frosted--loading': isLoading }"
+        >
           <q-card-section class="login-header">
             <div
               class="logo-container"
@@ -41,14 +63,12 @@
             </div>
           </q-card-section>
 
-          <!-- Form Section -->
           <q-card-section>
             <div class="row q-col-gutter-sm items-center">
-              <!-- Email Input -->
               <div class="col-12">
                 <q-input
                   v-model="state.userLogin.email"
-                  filled
+                  outlined
                   stack-label
                   name="email"
                   spellcheck="true"
@@ -71,11 +91,10 @@
                 </q-input>
               </div>
 
-              <!-- Password Input -->
               <div class="col-12">
                 <q-input
                   v-model="state.userLogin.password"
-                  filled
+                  outlined
                   stack-label
                   name="password"
                   :type="inputType"
@@ -113,7 +132,6 @@
                 </q-input>
               </div>
 
-              <!-- Remember Me & Forgot Password -->
               <div class="col-6">
                 <q-checkbox
                   v-model="rememberMe"
@@ -134,7 +152,6 @@
             </div>
           </q-card-section>
 
-          <!-- Actions Section -->
           <q-card-actions class="login-actions">
             <q-btn
               type="submit"
@@ -168,8 +185,8 @@
       :email="emailResetPassword"
       @update:dialog-visible="dialogResetPassword = $event"
       @update:email="emailResetPassword = $event"
-      @send:email="sendEmailResetPassword"
-      @reset:email="onResetEmailResetPassword"
+      @send-email="sendEmailResetPassword"
+      @reset-email="onResetEmailResetPassword"
     >
     </dialog-reset-password>
   </q-page>
@@ -255,13 +272,6 @@ export default defineComponent({
     )
     provide('vuelidate', emailResetPassword$)
 
-    const formClasses = computed(() => ({
-      'form-container': true,
-      'form-container--mobile': $q.platform.is.mobile,
-      'form-container--desktop': !$q.platform.is.mobile,
-      'form-container--loading': isLoading.value,
-    }))
-
     const inputType = computed(() => (showPassword.value ? 'text' : 'password'))
 
     const togglePasswordVisibility = () => {
@@ -340,6 +350,7 @@ export default defineComponent({
      * @returns {Promise<void>}
      */
     const sendEmailResetPassword = async () => {
+      // Example of commented out logic, keeping it here as it was.
       // loading.value = true
       // await usuarioService.sendEmailResetPassword(emailResetPassword.value)
       // notifySuccess(
@@ -380,7 +391,6 @@ export default defineComponent({
       dialogResetPassword,
       state,
       v$,
-      formClasses,
       inputType,
       togglePasswordVisibility,
       authenticate,
@@ -396,105 +406,79 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/quasar-variables.scss';
+@import '../../styles/quasar-variables.scss'; // Garante que as variáveis do Quasar estejam disponíveis
+
+.content-container {
+  width: 100%;
+  max-width: 450px; /* Default max-width for smaller screens */
+  margin: 0 auto; /* Center the container */
+  padding: 16px; /* Add some padding for smaller screens */
+
+  &--wide {
+    @media (min-width: $breakpoint-md-min) {
+      // Apply on medium and larger screens (desktop)
+      max-width: 450px; // Adjust this value to your desired desktop width
+      padding: 0; // Remove padding if not needed on desktop
+    }
+  }
+}
+
+// Estilos específicos para o wrapper do formulário nesta página
 .form-container {
   width: 100%;
 
-  &--mobile {
-    .auth-card {
-      border-radius: 20px 20px 20px 20px;
-    }
-  }
-
-  &--desktop {
-    .auth-card {
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    }
-  }
-
   &--loading {
-    pointer-events: none;
+    pointer-events: none; // Desabilita interações quando carregando
   }
 }
 
-.auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-
-  &--loading {
-    opacity: 0.8;
-  }
-
-  .body--dark & {
-    background: rgba(24, 35, 52, 0.95);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
-.login-header {
-  text-align: center;
-  padding: 32px 24px 24px;
-
-  .logo-container {
-    margin-bottom: 24px;
+// Animações que são específicas desta página de Login
+@keyframes animate-fade-in {
+  from {
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.6s ease;
-
-    &.animate-fade-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .logo {
-      max-width: 100%;
-      height: auto;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-    }
   }
-
-  .welcome-text {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease 0.2s;
-
-    &.animate-slide-up {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .welcome-title {
-      font-size: 24px;
-      font-weight: 600;
-      color: #2c3e50;
-      margin: 0 0 8px 0;
-      line-height: 1.3;
-
-      .body--dark & {
-        color: #ecf0f1;
-      }
-    }
-
-    .welcome-subtitle {
-      font-size: 15px;
-      color: #7f8c8d;
-      margin: 0;
-      line-height: 1.4;
-
-      .body--dark & {
-        color: #bdc3c7;
-      }
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.login-actions {
-  padding: 0 24px 24px;
-  flex-direction: column;
+@keyframes animate-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+.logo-container.animate-fade-in {
+  animation: animate-fade-in 0.6s ease forwards;
+}
+
+.welcome-text.animate-slide-up {
+  animation: animate-slide-up 0.6s ease 0.2s forwards;
+}
+
+// Melhorias de foco para inputs do Quasar neste componente
+:deep(.q-field--focused) {
+  .q-field__control {
+    box-shadow: 0 0 0 2px rgba(33, 186, 69, 0.2) !important;
+  }
+}
+
+// Melhorias de estado de erro para inputs do Quasar neste componente
+:deep(.q-field--error) {
+  .q-field__control {
+    box-shadow: 0 0 0 2px rgba(193, 0, 21, 0.2) !important;
+  }
+}
+
+// Estilos específicos para ações de login e seção de cadastro
+.login-actions {
   .auth-btn.auth-btn--green {
     width: 100%;
     height: 48px;
@@ -531,67 +515,9 @@ export default defineComponent({
   }
 }
 
-.partner-section {
-  text-align: center;
-  padding: 16px 24px;
-  background: rgba(0, 0, 0, 0.02);
-
-  .body--dark & {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .partner-text {
-    margin: 0;
-    color: #7f8c8d;
-    font-size: 14px;
-
-    .body--dark & {
-      color: #bdc3c7;
-    }
-  }
-}
-
-// Animations
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
 @media (max-width: 480px) {
-  .auth-form {
-    padding: 0 20px 20px;
-  }
-
   .login-actions {
     padding: 0 20px 20px;
-  }
-
-  .partner-section {
-    padding: 16px 20px;
-  }
-}
-
-// Loading state improvements
-.q-form {
-  transition: opacity 0.3s ease;
-}
-
-// Focus improvements
-:deep(.q-field--focused) {
-  .q-field__control {
-    box-shadow: 0 0 0 2px rgba(33, 186, 69, 0.2) !important;
-  }
-}
-
-// Error state improvements
-:deep(.q-field--error) {
-  .q-field__control {
-    box-shadow: 0 0 0 2px rgba(193, 0, 21, 0.2) !important;
   }
 }
 </style>
