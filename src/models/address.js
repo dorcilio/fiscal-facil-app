@@ -70,6 +70,7 @@ class Address {
    * @param {string} data.municipio - The name of the city.
    * @param {string} data.bairro - The name of the neighborhood.
    * @param {string} data.ibge - The IBGE code of the municipality.
+   * @param {string} data.descricao_tipo_de_logradouro - The type of street.
    * @param {string} data.logradouro - The name of the street.
    * @param {string} [data.numero] - The number of the address.
    * @param {string} [data.complemento] - The address complement.
@@ -187,10 +188,6 @@ const AddressValidation = {
     ),
   },
   ibge: {
-    required: helpers.withMessage(
-      'É necessário informar o código IBGE',
-      required
-    ),
     numeric: helpers.withMessage(
       'Código IBGE deve conter apenas números',
       numeric

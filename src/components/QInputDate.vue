@@ -5,9 +5,24 @@
     :spellcheck="spellcheck"
     :autocomplete="autocomplete"
     type="tel"
-    filled
+    :filled="filled"
+    :outlined="outlined"
+    :standout="standout"
+    :borderless="borderless"
+    :dense="dense"
+    :clearable="clearable"
+    :counter="counter"
+    :maxlength="maxlength"
+    :placeholder="placeholder"
+    :prefix="prefix"
+    :suffix="suffix"
+    :loading="loading"
+    :color="color"
+    :bg-color="bgColor"
+    :input-class="inputClass"
+    :input-style="inputStyle"
     mask="##/##/####"
-    :lazy-rule="lazyRules"
+    :lazy-rules="lazyRules"
     :rules="rules"
     :autofocus="autofocus"
     :error="error"
@@ -120,6 +135,86 @@ export default {
       type: [Boolean, String],
       default: false,
     },
+    filled: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    outlined: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    standout: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    borderless: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    dense: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    clearable: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    counter: {
+      required: false,
+      type: [Boolean, String],
+      default: false,
+    },
+    maxlength: {
+      required: false,
+      type: [Number, String],
+      default: null,
+    },
+    placeholder: {
+      required: false,
+      type: String,
+      default: '',
+    },
+    prefix: {
+      required: false,
+      type: String,
+      default: '',
+    },
+    suffix: {
+      required: false,
+      type: String,
+      default: '',
+    },
+    loading: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+    color: {
+      required: false,
+      type: String,
+      default: '', // Usará a cor padrão do tema Quasar
+    },
+    bgColor: {
+      required: false,
+      type: String,
+      default: '', // Usará a cor de fundo padrão do tema Quasar
+    },
+    inputClass: {
+      required: false,
+      type: [String, Array, Object],
+      default: '',
+    },
+    inputStyle: {
+      required: false,
+      type: [String, Array, Object],
+      default: '',
+    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -131,12 +226,12 @@ export default {
 
     const daysInMonth = (month, year) => {
       switch (month) {
-        case 1:
+        case 1: // Fevereiro (0-indexed para Luxon, ou 1-indexed para sua lógica)
           return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28
-        case 8:
-        case 3:
-        case 5:
-        case 10:
+        case 8: // Setembro (0-indexed)
+        case 3: // Abril (0-indexed)
+        case 5: // Junho (0-indexed)
+        case 10: // Novembro (0-indexed)
           return 30
         default:
           return 31
@@ -145,17 +240,17 @@ export default {
 
     const isValidDate = (date) => {
       const [year, month, day] = date.split('-').map(Number)
+      // Ajuste para mês 1-indexed se sua lógica `daysInMonth` espera isso
       return (
-        month >= 0 && month < 12 && day > 0 && day <= daysInMonth(month, year)
+        month >= 1 &&
+        month <= 12 &&
+        day > 0 &&
+        day <= daysInMonth(month - 1, year) // Ajustado para 0-indexed se daysInMonth usa 0-indexed months, se não remover o -1
       )
     }
 
     const isDisable = () => {
-      return props.readonly
-        ? props.readonly
-        : props.disable
-          ? props.disable
-          : false
+      return props.readonly || props.disable
     }
 
     const pickDate = (date) => {

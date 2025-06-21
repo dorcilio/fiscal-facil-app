@@ -62,273 +62,168 @@
           </div>
         </q-card-section>
         <q-card-section>
-          <q-stepper
-            ref="stepper"
-            v-model="currentStep"
-            animated
-            flat
-            contracted
-            alternative-labels
-            active-color="green-7"
-            done-color="green-7"
-            class="registration-stepper"
-          >
-            <q-step
-              :name="1"
-              title="Tipo e Documento"
-              icon="fa-solid fa-gear"
-              :done="currentStep > 1"
+          <q-form novalidate @submit.prevent="nextStep">
+            <q-stepper
+              ref="stepper"
+              v-model="currentStep"
+              animated
+              flat
+              contracted
+              alternative-labels
+              active-color="green-7"
+              done-color="green-7"
+              class="registration-stepper"
             >
-              <div class="q-gutter-sm q-mb-md">
-                <q-option-group
-                  v-model="selectedType"
-                  :options="[
-                    { label: 'Contabilidade', value: 'contabilidade' },
-                    { label: 'Pessoa Física', value: 'pessoaFisica' },
-                    { label: 'Pessoa Jurídica', value: 'pessoaJuridica' },
-                  ]"
-                  color="green-7"
-                  inline
-                  @update:model-value="resetPartnerData"
-                />
-              </div>
-
-              <q-input-mask
-                v-if="selectedType === 'contabilidade'"
-                v-model="v$.partnerRegistration.cpfCnpj.$model"
-                outlined
-                :label="cpfCnpjLabel"
-                :mask="cpfCnpjMask"
-                :error="v$.partnerRegistration.cpfCnpj.$error"
-                :error-message="
-                  v$.partnerRegistration.cpfCnpj.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                autofocus
-                name="cpf-cnpj"
-                @blur="v$.partnerRegistration.cpfCnpj.$touch"
+              <q-step
+                :name="1"
+                title="Tipo e Documento"
+                icon="fa-solid fa-gear"
+                :done="currentStep > 1"
               >
-                <template
-                  v-if="
-                    isCompanyType &&
-                    v$.partnerRegistration.cpfCnpj?.$model?.length === 14
-                  "
-                  #append
-                >
-                  <q-btn
-                    flat
-                    dense
-                    round
-                    icon="fa-solid fa-magnifying-glass"
-                    :disable="isLoading"
-                    @click="searchReceitaWS"
+                <div class="q-gutter-sm q-mb-md">
+                  <q-option-group
+                    v-model="selectedType"
+                    :options="[
+                      { label: 'Contabilidade', value: 'contabilidade' },
+                      { label: 'Pessoa Física', value: 'pessoaFisica' },
+                      { label: 'Pessoa Jurídica', value: 'pessoaJuridica' },
+                    ]"
+                    color="green-7"
+                    inline
+                    @update:model-value="resetPartnerData"
                   />
-                  <q-spinner v-if="isLoading" color="primary" size="2em" />
-                </template>
-              </q-input-mask>
-              <q-input
-                v-else
-                v-model="v$.partnerRegistration.cpfCnpj.$model"
-                outlined
-                :label="cpfCnpjLabel"
-                name="cpfCnpj"
-                :mask="isCompanyType ? '##.###.###/####-##' : '###.###.###-##'"
-                unmasked-value
-                :error="v$.partnerRegistration.cpfCnpj.$error"
-                :error-message="
-                  v$.partnerRegistration.cpfCnpj.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.cpfCnpj.$touch"
+                </div>
+
+                <q-input-mask
+                  v-if="selectedType === 'contabilidade'"
+                  v-model="partnerRegistration.details.cpfCnpj"
+                  outlined
+                  :label="cpfCnpjLabel"
+                  :mask="cpfCnpjMask"
+                  :error="v$.details.cpfCnpj.$error"
+                  :error-message="
+                    v$.details.cpfCnpj.$errors.map((e) => e.$message).join(', ')
+                  "
+                  lazy-rules
+                  autofocus
+                  name="cpf-cnpj"
+                  @blur="v$.details.cpfCnpj.$touch"
+                >
+                  <template
+                    v-if="
+                      isCompanyType &&
+                      partnerRegistration.details.cpfCnpj.length === 14
+                    "
+                    #append
+                  >
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="fa-solid fa-magnifying-glass"
+                      :disable="isLoading"
+                      @click="searchReceitaWS"
+                    />
+                    <q-spinner v-if="isLoading" color="primary" size="2em" />
+                  </template>
+                </q-input-mask>
+                <q-input
+                  v-else
+                  v-model="partnerRegistration.details.cpfCnpj"
+                  outlined
+                  :label="cpfCnpjLabel"
+                  name="cpfCnpj"
+                  :mask="
+                    isCompanyType ? '##.###.###/####-##' : '###.###.###-##'
+                  "
+                  unmasked-value
+                  :error="v$.details.cpfCnpj.$error"
+                  :error-message="
+                    v$.details.cpfCnpj.$errors.map((e) => e.$message).join(', ')
+                  "
+                  lazy-rules
+                  @blur="v$.details.cpfCnpj.$touch"
+                >
+                  <template
+                    v-if="
+                      isCompanyType &&
+                      partnerRegistration.details.cpfCnpj.length === 14
+                    "
+                    #append
+                  >
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="fa-solid fa-magnifying-glass"
+                      :disable="isLoading"
+                      @click="searchReceitaWS"
+                    />
+                    <q-spinner v-if="isLoading" color="primary" size="2em" />
+                  </template>
+                </q-input>
+              </q-step>
+
+              <q-step
+                :name="2"
+                title="Dados da Empresa"
+                icon="fa-solid fa-building"
+                :done="currentStep > 2"
               >
-                <template
-                  v-if="
-                    isCompanyType &&
-                    v$.partnerRegistration.cpfCnpj.$model.length === 14
-                  "
-                  #append
-                >
+                <partner-details-form
+                  v-model="partnerRegistration.details"
+                  :loading="isLoading"
+                />
+              </q-step>
+
+              <q-step
+                :name="3"
+                title="Endereço"
+                icon="fa-solid fa-location-dot"
+                :done="currentStep > 3"
+              >
+                <address-form
+                  v-model="partnerRegistration.address"
+                  :loading="isLoading"
+                />
+              </q-step>
+
+              <q-step
+                :name="4"
+                title="Dados do Usuário"
+                icon="fa-solid fa-user"
+                :done="currentStep > 4"
+              >
+                <user-registration-form
+                  v-model="partnerRegistration.user"
+                  :loading="isLoading"
+                />
+              </q-step>
+
+              <template #navigation>
+                <q-stepper-navigation class="q-pt-md text-center">
                   <q-btn
+                    v-if="currentStep > 1"
+                    type="button"
                     flat
-                    dense
-                    round
-                    icon="fa-solid fa-magnifying-glass"
-                    :disable="isLoading"
-                    @click="searchReceitaWS"
+                    size="lg"
+                    color="green-7"
+                    label="Anterior"
+                    class="q-ml-sm"
+                    @click="stepper.previous()"
                   />
-                  <q-spinner v-if="isLoading" color="primary" size="2em" />
-                </template>
-              </q-input>
-            </q-step>
-
-            <q-step
-              :name="2"
-              title="Dados da Empresa"
-              icon="fa-solid fa-building"
-              :done="currentStep > 2"
-            >
-              <q-input
-                v-model="v$.partnerRegistration.razaoSocial.$model"
-                outlined
-                label="Razão Social"
-                class="q-mb-md"
-                :error="v$.partnerRegistration.razaoSocial.$error"
-                :error-message="
-                  v$.partnerRegistration.razaoSocial.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.razaoSocial.$touch"
-              />
-              <q-input
-                v-model="v$.partnerRegistration.fantasia.$model"
-                outlined
-                label="Nome Fantasia"
-                class="q-mb-md"
-                :error="v$.partnerRegistration.fantasia.$error"
-                :error-message="
-                  v$.partnerRegistration.fantasia.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.fantasia.$touch"
-              />
-              <q-input
-                v-model="v$.partnerRegistration.telefone.$model"
-                outlined
-                label="Telefone Principal"
-                mask="(##) #####-####"
-                unmasked-value
-                class="q-mb-md"
-                :error="v$.partnerRegistration.telefone.$error"
-                :error-message="
-                  v$.partnerRegistration.telefone.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.telefone.$touch"
-              />
-              <q-input
-                v-model="v$.partnerRegistration.telefoneSecundario.$model"
-                outlined
-                label="Telefone Secundário (Opcional)"
-                mask="(##) #####-####"
-                unmasked-value
-                class="q-mb-md"
-                :error="v$.partnerRegistration.telefoneSecundario.$error"
-                :error-message="
-                  v$.partnerRegistration.telefoneSecundario.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.telefoneSecundario.$touch"
-              />
-
-              <q-input
-                v-if="isCompanyType"
-                v-model="v$.partnerRegistration.cnaeId.$model"
-                outlined
-                label="CNAE Principal"
-                class="q-mb-md"
-                :error="v$.partnerRegistration.cnaeId.$error"
-                :error-message="
-                  v$.partnerRegistration.cnaeId.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.cnaeId.$touch"
-              />
-              <q-input
-                v-if="isCompanyType"
-                v-model="partnerRegistration.cnaeDescricao"
-                outlined
-                label="Descrição CNAE"
-                readonly
-                class="q-mb-md"
-              />
-              <q-input
-                v-if="
-                  selectedType === 'pessoaFisica' ||
-                  selectedType === 'pessoaJuridica'
-                "
-                v-model="v$.partnerRegistration.ie.$model"
-                outlined
-                label="Inscrição Estadual (IE)"
-                class="q-mb-md"
-                :error="v$.partnerRegistration.ie.$error"
-                :error-message="
-                  v$.partnerRegistration.ie.$errors
-                    .map((e) => e.$message)
-                    .join(', ')
-                "
-                lazy-rules
-                @blur="v$.partnerRegistration.ie.$touch"
-              />
-            </q-step>
-
-            <q-step
-              :name="3"
-              title="Endereço"
-              icon="fa-solid fa-location-dot"
-              :done="currentStep > 3"
-            >
-              <address-form
-                ref="addressFormComponent"
-                v-model="partnerRegistration.address"
-              />
-            </q-step>
-
-            <q-step
-              :name="4"
-              title="Dados do Usuário"
-              icon="fa-solid fa-user"
-              :done="currentStep > 4"
-            >
-              <user-registration-form
-                ref="userFormComponent"
-                v-model="partnerRegistration.user"
-              />
-            </q-step>
-
-            <template #navigation>
-              <q-stepper-navigation class="q-pt-md text-center">
-                <q-btn
-                  v-if="currentStep > 1"
-                  flat
-                  size="lg"
-                  color="green-7"
-                  label="Anterior"
-                  class="q-ml-sm"
-                  @click="stepper.previous()"
-                />
-                <q-btn
-                  v-if="currentStep < 4"
-                  size="lg"
-                  color="green-7"
-                  label="Próximo"
-                  class="q-ml-sm"
-                  @click="nextStep"
-                />
-                <q-btn
-                  v-if="currentStep === 4"
-                  size="lg"
-                  color="green-7"
-                  label="Cadastrar"
-                  class="q-ml-sm"
-                  @click="submitRegistration"
-                />
-              </q-stepper-navigation>
-            </template>
-          </q-stepper>
+                  <q-btn
+                    v-if="currentStep <= 4"
+                    type="submit"
+                    size="lg"
+                    color="green-7"
+                    :label="currentStep === 4 ? 'Finalizar' : 'Próximo'"
+                    class="q-ml-sm"
+                  />
+                </q-stepper-navigation>
+              </template>
+            </q-stepper>
+          </q-form>
         </q-card-section>
         <q-card-actions class="login-actions">
           <div class="signup-section">
@@ -346,7 +241,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, reactive, onMounted } from 'vue'
+import { ref, computed, watch, reactive, onMounted, provide } from 'vue' // Adicionado provide
 import { useVuelidate } from '@vuelidate/core'
 import { useQuasar } from 'quasar'
 
@@ -360,6 +255,7 @@ import {
 } from '@/models/partner'
 
 import QInputMask from '@/components/QInputMask.vue'
+import PartnerDetailsForm from '@/components/partner/PartnerDetailsForm.vue'
 import AddressForm from '@/components/AddressForm.vue'
 import UserRegistrationForm from '@/components/partner/UserRegistrationForm.vue'
 import CustomLink from '@/components/CustomLink.vue'
@@ -367,26 +263,25 @@ import CustomLink from '@/components/CustomLink.vue'
 // Assets
 import logoDefault from '../../assets/fiscal-facil.svg?url'
 import logoDark from '../../assets/fiscal-facil-dark.svg?url'
+import { notifySuccess, notifyWarning } from '@/plugins'
 
 export default {
   name: 'PartnerRegistrationComponent',
   components: {
     QInputMask,
+    PartnerDetailsForm,
     AddressForm,
     UserRegistrationForm,
     CustomLink,
   },
   setup() {
-    // Refs de Componente
-    const addressFormComponent = ref(null)
-    const userFormComponent = ref(null)
+    // Refs de Componente (apenas o stepper permanece)
     const stepper = ref(null)
-    const docType = ref('')
 
     // Estado Reativo
     const currentStep = ref(1)
     const selectedType = ref('pessoaJuridica')
-    const partnerRegistration = ref(null)
+    const partnerRegistration = ref(new PessoaJuridicaRegistration())
     const isLoading = ref(false)
     const showWelcomeAnimation = ref(false)
 
@@ -407,32 +302,29 @@ export default {
 
     // Propriedades Computadas
     const cpfCnpjLabel = computed(() => {
-      if (docType.value === 'cpf') {
-        return 'CPF'
-      } else if (docType.value === 'cnpj') {
-        return 'CNPJ'
+      if (selectedType.value === 'pessoaFisica') {
+        return 'CPF *'
+      } else if (selectedType.value === 'pessoaJuridica') {
+        return 'CNPJ *'
       }
-      return 'CPF/CNPJ'
+      return 'CPF/CNPJ *'
     })
 
-    // Propriedade computada para a máscara do input
     const cpfCnpjMask = computed(() => {
       if (selectedType.value === 'pessoaFisica') {
-        return '000.000.000-00' // Agora retorna um array mesmo para uma única máscara
+        return '000.000.000-00'
       } else if (selectedType.value === 'pessoaJuridica') {
-        return '00.000.000/0000-00' // Retorna array
+        return '00.000.000/0000-00'
       }
-      // Para Contabilidade ou tipo não selecionado (detecção automática)
       return [
         {
-          mask: '000.000.000-00', // CPF
+          mask: '000.000.000-00',
         },
         {
-          mask: '00.000.000/0000-00', // CNPJ
+          mask: '00.000.000/0000-00',
         },
       ]
     })
-    console.log('cpfCnpjMask', cpfCnpjMask.value)
 
     const isCompanyType = computed(() => {
       return (
@@ -444,20 +336,36 @@ export default {
     const validationRules = computed(() => {
       switch (selectedType.value) {
         case 'contabilidade':
-          return { partnerRegistration: ContabilidadeValidation }
+          return ContabilidadeValidation
         case 'pessoaFisica':
-          return { partnerRegistration: PessoaFisicaValidation }
+          return PessoaFisicaValidation
         case 'pessoaJuridica':
-          return { partnerRegistration: PessoaJuridicaValidation }
+          return PessoaJuridicaValidation
         default:
           return {}
       }
     })
 
-    // Vuelidate
-    const v$ = useVuelidate(validationRules, { partnerRegistration })
+    // Vuelidate setup
+    const v$ = useVuelidate(validationRules, partnerRegistration)
 
-    // Watcher
+    // PROVIDE as instâncias de validação para os componentes filhos
+    // Usamos computed para garantir que as referências sejam reativas
+    // e atualizem nos filhos quando partnerRegistration muda.
+    provide(
+      'partnerDetailsVuelidate',
+      computed(() => v$.value.details)
+    )
+    provide(
+      'addressVuelidate',
+      computed(() => v$.value.address)
+    )
+    provide(
+      'userRegistrationVuelidate',
+      computed(() => v$.value.user)
+    )
+
+    // Watcher para `selectedType`
     watch(
       selectedType,
       (newType) => {
@@ -467,101 +375,149 @@ export default {
               partnerRegistration.value = reactive(
                 new ContabilidadeRegistration()
               )
-              docType.value = '' // Volta ao estado de detecção automática
               break
             case 'pessoaFisica':
               partnerRegistration.value = reactive(
                 new PessoaFisicaRegistration()
               )
-              docType.value = 'cpf' // CPF é fixo para Pessoa Física
               break
             case 'pessoaJuridica':
               partnerRegistration.value = reactive(
                 new PessoaJuridicaRegistration()
               )
-              docType.value = 'cnpj' // CNPJ é fixo para Pessoa Jurídica
               break
           }
+          // Resetar a validação da Vuelidate principal e suas sub-instâncias
           v$.value.$reset()
         }
       },
       { immediate: true }
     )
 
+    // Hook `onMounted`
     onMounted(() => {
       setTimeout(() => {
         showWelcomeAnimation.value = true
       }, 300)
     })
 
+    /**
+     * Reseta os dados do parceiro e a validação do formulário.
+     * Chamado ao mudar o tipo de registro (Contabilidade, PF, PJ).
+     */
     function resetPartnerData() {
       if (partnerRegistration.value?.reset) {
         partnerRegistration.value.reset()
       }
-      docType.value = ''
+      // Reseta a validação de toda a instância Vuelidate.
+      // Os componentes filhos, ao injetar e usar essa instância,
+      // terão seus estados de validação resetados automaticamente.
       v$.value.$reset()
     }
 
+    /**
+     * Avança para o próximo passo do stepper, validando o passo atual.
+     */
     async function nextStep() {
       let isStepValid = false
+
       switch (currentStep.value) {
         case 1:
-          isStepValid = await v$.value.partnerRegistration.cpfCnpj.$validate()
+          isStepValid = await v$.value.details.cpfCnpj.$validate()
           break
         case 2:
-          isStepValid = await v$.value.partnerRegistration.$validate([
-            'razaoSocial',
-            'fantasia',
-            'telefone',
-            // O CNAE e IE são condicionais, então precisamos ajustar a validação para eles
-            ...(isCompanyType.value ? ['cnaeId'] : []), // Adiciona cnaeId se for tipo empresa
-            ...(selectedType.value === 'pessoaFisica' ||
-            selectedType.value === 'pessoaJuridica'
-              ? ['ie']
-              : []), // Adiciona ie se for PF ou PJ
-          ])
+          // A validação agora é feita diretamente na instância Vuelidate do pai
+          // que gerencia os dados do PartnerDetailsForm.
+          isStepValid = await v$.value.details.$validate()
           break
         case 3:
-          if (addressFormComponent.value) {
-            isStepValid = await addressFormComponent.value.validate()
-          }
+          // A validação agora é feita diretamente na instância Vuelidate do pai
+          // que gerencia os dados do AddressForm.
+          isStepValid = await v$.value.address.$validate()
+          break
+        case 4:
+          // A validação agora é feita diretamente na instância Vuelidate do pai
+          // que gerencia os dados do UserRegistrationForm.
+          isStepValid = await v$.value.user.$validate()
           break
       }
 
       if (isStepValid) {
-        stepper.value.next()
+        if (currentStep.value < 4) {
+          stepper.value.next()
+        } else {
+          submitRegistration()
+        }
       } else {
-        $q.notify({
-          type: 'negative',
-          message: 'Por favor, corrija os erros antes de prosseguir.',
-          position: 'top',
-        })
+        notifyWarning(
+          'Por favor, preencha os campos obrigatórios antes de prosseguir.'
+        )
       }
     }
 
+    /**
+     * Envia o formulário de registro após validar todos os passos.
+     */
+    async function submitRegistration() {
+      // Validações individuais para cada passo, feitas diretamente na instância Vuelidate do pai
+      const isStep1Valid = await v$.value.details.cpfCnpj.$validate()
+      const isStep2Valid = await v$.value.details.$validate()
+      const isStep3Valid = await v$.value.address.$validate()
+      const isStep4Valid = await v$.value.user.$validate()
+
+      if (isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid) {
+        const payload = partnerRegistration.value.toRequest()
+        console.log(
+          'Dados do Parceiro para registro:',
+          JSON.parse(JSON.stringify(payload))
+        )
+
+        notifySuccess('Parceiro registrado com sucesso!')
+      } else {
+        notifyWarning(
+          'Por favor, preencha os campos obrigatórios antes de prosseguir.'
+        )
+      }
+    }
+
+    /**
+     * Realiza a busca de dados na Receita WS com base no CNPJ.
+     * Popula os campos do formulário com os dados retornados.
+     */
     async function searchReceitaWS() {
-      // Sua lógica para buscar na Receita WS
-      // Lembre-se de usar partnerRegistration.value.cpfCnpj (já unmasked)
-      // E atualizar os campos do partnerRegistration com os dados da Receita WS
       isLoading.value = true
       try {
-        // Exemplo de lógica (substitua pela sua API)
-        console.log(`Buscando CNPJ: ${partnerRegistration.value.cpfCnpj}`)
-        // Simulação de delay de API
+        const cnpj = partnerRegistration.value.details.cpfCnpj
+        console.log(`Buscando CNPJ: ${cnpj}`)
+
         await new Promise((resolve) => setTimeout(resolve, 1500))
-        // Preencher dados (exemplo)
-        if (partnerRegistration.value.cpfCnpj === '00000000000000') {
-          partnerRegistration.value.razaoSocial = 'Empresa Teste LTDA'
-          partnerRegistration.value.fantasia = 'Teste Fantasia'
-          partnerRegistration.value.cnaeId = '6201601' // Exemplo CNAE
-          partnerRegistration.value.cnaeDescricao =
-            'Desenvolvimento de programas de computador'
-          partnerRegistration.value.address.cep = '78600000' // Exemplo de CEP
-          partnerRegistration.value.address.logradouro = 'Rua Exemplo'
-          partnerRegistration.value.address.numero = '123'
-          partnerRegistration.value.address.bairro = 'Centro'
-          partnerRegistration.value.address.cidade = 'Barra do Garças'
-          partnerRegistration.value.address.estado = 'MT'
+
+        if (cnpj === '00000000000000') {
+          partnerRegistration.value.details.parseFromReceitaWS({
+            cnpj: '00000000000000',
+            razao_social: 'Empresa Teste LTDA',
+            nome_fantasia: 'Teste Fantasia',
+            ddd_telefone_1: '11987654321',
+            ddd_telefone_2: '11123456789',
+            situacao: 'ATIVA',
+            cnae_fiscal: '6201601',
+            cnae_fiscal_descricao: 'Desenvolvimento de programas de computador',
+            cnaes_secundarios: [
+              {
+                codigo: '6202300',
+                descricao: 'Consultoria em tecnologia da informação',
+              },
+            ],
+            ie: '123456789',
+          })
+          partnerRegistration.value.address.parseFromReceitaWS({
+            cep: '78600000',
+            logradouro: 'Rua Exemplo',
+            numero: '123',
+            bairro: 'Centro',
+            municipio: 'Barra do Garças',
+            uf: 'MT',
+          })
           $q.notify({
             type: 'positive',
             message: 'Dados preenchidos com sucesso!',
@@ -582,75 +538,21 @@ export default {
         isLoading.value = false
       }
     }
-
-    async function submitRegistration() {
-      // Validar todos os passos antes de submeter
-      const isStep1Valid =
-        await v$.value.partnerRegistration.cpfCnpj.$validate()
-      let isStep2Valid = true // Assume true e valida condicionalmente
-      if (currentStep.value >= 2) {
-        isStep2Valid = await v$.value.partnerRegistration.$validate([
-          'razaoSocial',
-          'fantasia',
-          'telefone',
-          ...(isCompanyType.value ? ['cnaeId'] : []),
-          ...(selectedType.value === 'pessoaFisica' ||
-          selectedType.value === 'pessoaJuridica'
-            ? ['ie']
-            : []),
-        ])
-      }
-      let isStep3Valid = true
-      if (currentStep.value >= 3 && addressFormComponent.value) {
-        isStep3Valid = await addressFormComponent.value.validate()
-      }
-      let isStep4Valid = true
-      if (currentStep.value >= 4 && userFormComponent.value) {
-        isStep4Valid = await userFormComponent.value.validate()
-      }
-
-      if (isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid) {
-        // Lógica de envio do formulário
-        console.log(
-          'Dados do Parceiro para registro:',
-          JSON.parse(JSON.stringify(partnerRegistration.value))
-        )
-        $q.notify({
-          type: 'positive',
-          message: 'Registro submetido com sucesso!',
-          position: 'top',
-        })
-        // Aqui você faria a chamada à API para registrar o parceiro
-      } else {
-        $q.notify({
-          type: 'negative',
-          message: 'Por favor, corrija todos os erros antes de cadastrar.',
-          position: 'top',
-        })
-      }
-    }
-
     return {
-      // Estado
       currentStep,
       selectedType,
       partnerRegistration,
       isLoading,
-      v$,
+      v$, // Vuelidate instance principal
 
-      // Refs de Componente
       stepper,
-      addressFormComponent,
-      userFormComponent,
       logoTheme,
       showWelcomeAnimation,
 
-      // Computeds
       cpfCnpjLabel,
       cpfCnpjMask,
       isCompanyType,
 
-      // Métodos
       resetPartnerData,
       nextStep,
       searchReceitaWS,
@@ -738,7 +640,6 @@ export default {
 }
 
 @media (max-width: $breakpoint-xs-max) {
-  // Ajustes específicos para mobile se necessário, mantendo os que já estavam aqui.
   .login-header {
     padding: 24px 16px 16px;
   }

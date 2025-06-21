@@ -319,6 +319,13 @@ const UserRegistrationValidation = {
   },
 }
 
+const mockGenderOptions = [
+  { genderId: 1, genderName: 'Feminino' },
+  { genderId: 2, genderName: 'Masculino' },
+  { genderId: 3, genderName: 'Não-binário' },
+  { genderId: 4, genderName: 'Não informar' },
+]
+
 export default {
   UserProfile,
   UserLogin,
@@ -334,4 +341,5 @@ export {
   UserLoginValidation,
   UserRegistration,
   UserRegistrationValidation,
+  mockGenderOptions,
 }

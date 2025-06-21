@@ -11,7 +11,7 @@
 import { computed } from 'vue'
 
 export default {
-  name: 'ColumnEdit',
+  name: 'CustomClick',
   props: {
     icon: {
       type: String,

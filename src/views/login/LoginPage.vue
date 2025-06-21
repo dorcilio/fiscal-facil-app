@@ -141,13 +141,13 @@
                 />
               </div>
               <div class="col-6 text-right">
-                <column-edit
+                <custom-click
                   color="green-7"
                   icon="fa-solid fa-key"
                   @click="onShowDialogResetPassword"
                 >
                   Esqueceu a senha?
-                </column-edit>
+                </custom-click>
               </div>
             </div>
           </q-card-section>
@@ -214,7 +214,7 @@ import { notifyError, notifySuccess } from '../../plugins/notify'
 
 // Components
 import CustomLink from '../../components/CustomLink.vue'
-import ColumnEdit from '../../components/ColumnEdit.vue'
+import CustomClick from '../../components/CustomClick.vue'
 import DialogResetPassword from './DialogResetPassword.vue'
 
 // Assets
@@ -229,7 +229,7 @@ export default defineComponent({
   name: 'LoginPage',
   components: {
     CustomLink,
-    ColumnEdit,
+    CustomClick,
     DialogResetPassword,
   },
   setup() {

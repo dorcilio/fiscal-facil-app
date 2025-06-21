@@ -1,133 +1,222 @@
 <template>
-  <div class="address-form q-pa-md">
-    <h5 class="text-h6 q-mb-md">Endereço</h5>
+  <div class="row q-col-gutter-sm">
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.zipCode"
+        outlined
+        autofocus
+        label="CEP *"
+        name="cep"
+        mask="#####-###"
+        unmasked-value
+        :error="hasFieldError('cep')"
+        :error-message="getFieldErrorMessage('cep')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('cep')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.zipCode"
-      filled
-      label="CEP *"
-      mask="#####-###"
-      unmasked-value
-      :error="v.zipCode.$error"
-      :error-message="v.zipCode.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.zipCode.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.address"
+        v-capitalize
+        outlined
+        label="Rua *"
+        name="rua"
+        :error="hasFieldError('address')"
+        :error-message="getFieldErrorMessage('address')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('address')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.street"
-      filled
-      label="Rua *"
-      :error="v.street.$error"
-      :error-message="v.street.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.street.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.addressNumber"
+        outlined
+        type="number"
+        maxlength="10"
+        label="Número *"
+        name="numero"
+        :error="hasFieldError('addressNumber')"
+        :error-message="getFieldErrorMessage('addressNumber')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('addressNumber')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.number"
-      filled
-      label="Número *"
-      :error="v.number.$error"
-      :error-message="v.number.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.number.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.complement"
+        outlined
+        label="Complemento"
+        name="complemento"
+        :error="hasFieldError('addressNumber')"
+        :error-message="getFieldErrorMessage('addressNumber')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('addressNumber')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.complement"
-      filled
-      label="Complemento"
-      :error="v.complement.$error"
-      :error-message="v.complement.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.complement.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.neighborhood"
+        v-capitalize
+        outlined
+        label="Bairro *"
+        name="bairro"
+        :error="hasFieldError('neighborhood')"
+        :error-message="getFieldErrorMessage('neighborhood')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('neighborhood')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.neighborhood"
-      filled
-      label="Bairro *"
-      :error="v.neighborhood.$error"
-      :error-message="v.neighborhood.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.neighborhood.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.city"
+        v-capitalize
+        outlined
+        label="Cidade *"
+        :error="hasFieldError('city')"
+        :error-message="getFieldErrorMessage('city')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('city')"
+      />
+    </div>
 
-    <q-input
-      v-model="internalAddressForm.city"
-      filled
-      label="Cidade *"
-      :error="v.city.$error"
-      :error-message="v.city.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.city.$touch"
-    />
-
-    <q-input
-      v-model="internalAddressForm.state"
-      filled
-      label="Estado *"
-      :error="v.state.$error"
-      :error-message="v.state.$errors.map((e) => e.$message).join(', ')"
-      class="q-mb-md"
-      :disable="isLoading"
-      @blur="v.state.$touch"
-    />
+    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+      <q-input
+        v-model="internalAddress.state"
+        outlined
+        uppercase
+        label="Estado *"
+        name="estado"
+        mask="AA"
+        maxlength="2"
+        :error="hasFieldError('state')"
+        :error-message="getFieldErrorMessage('state')"
+        :disable="isLoading"
+        lazy-rules
+        @blur="validateField('state')"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import { computed, defineComponent, defineExpose } from 'vue'
-import { AddressValidation } from '@/models/address'
+import { computed, defineComponent, inject } from 'vue'
 import useVuelidate from '@vuelidate/core'
+import { Address, AddressValidation } from '@/models/address'
 
 export default defineComponent({
   name: 'AddressForm',
   props: {
-    // Usamos modelValue para v-model no Vue 3. Deve ser um objeto Address
     modelValue: {
       type: Object,
-      required: true,
-      // Você pode adicionar um validador para verificar a estrutura do objeto,
-      // ou assumir que ele sempre será uma instância de Address
-      // validator: (val) => val instanceof Address
+      default: () => new Address(),
     },
-    // Prop para desabilitar campos, útil se o formulário pai estiver em loading
-    isLoading: {
+    validationRules: {
+      type: [Object, AddressValidation],
+      default: () => AddressValidation,
+    },
+    loading: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['update:modelValue'], // Declarar o evento para v-model
-
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
-    // Cria uma referência reativa para o modelValue para trabalhar internamente
-    // e garantir que as alterações sejam emitidas de volta ao pai
-    const internalAddressForm = computed({
+    // Estado interno reativo
+    const internalAddress = computed({
       get: () => props.modelValue,
       set: (value) => emit('update:modelValue', value),
     })
 
-    // As regras de validação para o modelo Address
-    const rules = computed(() => AddressValidation)
+    // Regras de validação
+    const rules = computed(() => props.validationRules)
 
-    // Vuelidate inicializado com a referência reativa
-    const v = useVuelidate(rules, internalAddressForm, { $autoDirty: true })
+    // isLoading indicará se o formulário está sendo carregado
+    const isLoading = computed(() => props.loading)
 
-    // Exponha o Vuelidate para validação pelo componente pai
-    defineExpose({
-      validate: v.value.$validate,
-    })
+    // Instância do Vuelidate
+    const v$ = inject('addressVuelidate', useVuelidate(rules, internalAddress))
+
+    /**
+     * Verifica se um campo específico tem erro de validação.
+     * Caso o campo tenha uma validação associada, retorna o valor da propriedade `$error` desse campo.
+     * Caso o campo não tenha validação associada, ou se o Vuelidate estiver sem instância, retorna `false`.
+     * @param {string} fieldName - Nome do campo a ser verificado.
+     * @returns {boolean} - Se o campo tem erro de validação, retorna `true`; caso contrário, retorna `false`.
+     */
+    const hasFieldError = (fieldName) => {
+      return v$.value ? v$.value[fieldName]?.$error || false : false
+    }
+
+    /**
+     * Retorna a mensagem de erro para um campo especificado, se houver.
+     * Caso o campo esteja válido, retorna uma string vazia.
+     * @param {string} fieldName - Nome do campo a ser verificado.
+     * @returns {string} - Mensagem de erro, ou uma string vazia.
+     */
+    const getFieldErrorMessage = (fieldName) => {
+      if (!v$.value || !v$.value[fieldName]?.$error) {
+        return ''
+      }
+      return v$.value[fieldName].$errors
+        .map((error) => error.$message)
+        .join(', ')
+    }
+
+    /**
+     * Valida um campo especificado do formulário.
+     * Se o campo tiver uma validação associada, a executa.
+     * @param {string} fieldName - Nome do campo a ser validado.
+     * @returns {Promise<void>}
+     */
+    const validateField = async (fieldName) => {
+      if (v$.value && v$.value[fieldName]) {
+        await v$.value[fieldName].$touch()
+      }
+    }
+
+    /**
+     * Valida todos os campos gerenciados por este componente.
+     * Retorna true se a validação for bem-sucedida, false caso contrário.
+     * @async
+     * @returns {Promise<boolean>}
+     */
+    const validate = async () => {
+      if (v$.value) {
+        return await v$.value.$validate()
+      }
+      return true
+    }
+
+    /**
+     * Redefina a validação de todos os campos neste componente.
+     * Útil quando o usuário sai da etapa atual.
+     */
+    const resetValidation = () => {
+      if (v$.value) {
+        v$.value.$reset()
+      }
+    }
     return {
-      v,
-      internalAddressForm,
+      isLoading,
+      v$,
+      internalAddress,
+      hasFieldError,
+      getFieldErrorMessage,
+      validateField,
+      validate,
+      resetValidation,
     }
   },
 })
